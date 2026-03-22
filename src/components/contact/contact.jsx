@@ -69,7 +69,9 @@ const Contact = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  
+
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!validateForm()) return;
@@ -79,32 +81,35 @@ const Contact = () => {
 
   try {
     const API_URL = import.meta.env.VITE_API_URL;
-    const response = await fetch(`${API_URL}/contact`,{
+    console.log("API URL:", API_URL); // debug
+
+    const response = await fetch(`${API_URL}/contact`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
-    const result = await response.json();
-
-    if (response.ok) {
-      setSubmitStatus("success");
-      setFormData({ name: "", email: "", message: "" });
-      console.log("✅ Message sent:", result);
-    } else {
-      setSubmitStatus("error");
-      console.error("❌ Error:", result.message);
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      result = { message: "Server error" };
     }
 
-    setTimeout(() => setSubmitStatus(null), 5000);
+    if (!response.ok) {
+      throw new Error(result.message || "Request failed");
+    }
+
+    setSubmitStatus("success");
+    setFormData({ name: "", email: "", message: "" });
+
   } catch (error) {
-    console.error("Network error:", error);
+    console.error("❌ Error:", error.message);
     setSubmitStatus("error");
   } finally {
     setIsSubmitting(false);
   }
 };
-
 
   const handleSocialClick = (platform, e) => {
     e.preventDefault();
