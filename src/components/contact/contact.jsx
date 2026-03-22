@@ -16,10 +16,10 @@ const Contact = () => {
     phone: '+91 98765 43210',
     address: 'New Delhi, India',
     socialMedia: [
-      { name: 'Facebook', icon: '🌐', url: '#' },
-      { name: 'Instagram', icon: '📸', url: '#' },
+      { name: 'Facebook', icon: '🌐', url: 'https://www.facebook.com/utkarsh.rai.986' },
+      { name: 'Instagram', icon: '📸', url: 'https://www.instagram.com/r_utkarsh_29?igsh=NXUybWVvYzZwYWp2' },
       { name: 'Twitter', icon: '🐦', url: '#' },
-      { name: 'LinkedIn', icon: '💼', url: '#' }
+      { name: 'LinkedIn', icon: '💼', url: 'https://www.linkedin.com/in/utkarsh-rai-9009b932b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app' }
     ],
     businessHours: [
       { day: 'Mon - Fri', hours: '9:00 AM - 6:00 PM' },
