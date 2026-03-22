@@ -1,0 +1,874 @@
+/* find.css - Light Theme */
+
+/* Container Styles */
+.tourism-map-container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Loading State */
+.tourism-map-container.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
+
+.loading-spinner {
+  text-align: center;
+  color: #667eea;
+  animation: fadeIn 0.5s ease;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(102, 126, 234, 0.3);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.loading-spinner p {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  color: #495057;
+}
+
+.loading-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+  color: #6c757d;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Map Content */
+.map-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Search Section */
+.search-section {
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  z-index: 1000;
+  position: relative;
+}
+
+.search-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 200px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+.search-loader {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.search-button,
+.location-button,
+.all-india-button,
+.satellite-button,
+.sidebar-toggle {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.search-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.location-button {
+  background: #28a745;
+  color: white;
+}
+
+.all-india-button {
+  background: #ffc107;
+  color: #333;
+}
+
+.satellite-button {
+  background: #17a2b8;
+  color: white;
+}
+
+.sidebar-toggle {
+  background: #6c757d;
+  color: white;
+  display: none;
+}
+
+.search-button:hover,
+.location-button:hover,
+.all-india-button:hover,
+.satellite-button:hover,
+.sidebar-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.search-button:active,
+.location-button:active,
+.all-india-button:active,
+.satellite-button:active,
+.sidebar-toggle:active {
+  transform: translateY(0);
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.stats-bar span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-category {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: #e9ecef;
+}
+
+/* City Selector */
+.city-selector-section {
+  margin-bottom: 1rem;
+}
+
+.city-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.city-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Filter Section */
+.filter-section {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.filter-section select {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-section select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Error Message */
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border: 1px solid #f5c6cb;
+}
+
+.error-message button {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Search Results */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1001;
+  margin-top: 0.25rem;
+  border: 1px solid #e0e0e0;
+}
+
+.search-result-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+  background: #f8f9fa;
+}
+
+.result-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.result-type {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+/* Map Layout */
+.map-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Places Sidebar */
+.places-sidebar {
+  width: 320px;
+  background: white;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.sidebar-header h3 {
+  color: #333;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.places-count {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  font-weight: normal;
+  color: #6c757d;
+}
+
+.close-sidebar {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: none;
+  padding: 0 0.5rem;
+}
+
+/* Places List */
+.places-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.place-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.place-card:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.place-card h4 {
+  color: #333;
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.place-location {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.place-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.place-type {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.place-type.historical { background: #dc3545; color: white; }
+.place-type.nature { background: #28a745; color: white; }
+.place-type.religious { background: #ffc107; color: #333; }
+.place-type.cultural { background: #17a2b8; color: white; }
+.place-type.accommodation { background: #6f42c1; color: white; }
+.place-type.other { background: #6c757d; color: white; }
+
+.place-rating {
+  font-size: 0.75rem;
+  color: #ffc107;
+}
+
+.place-description {
+  font-size: 0.8rem;
+  color: #6c757d;
+  line-height: 1.4;
+  margin: 0.5rem 0;
+}
+
+.place-contact {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin: 0.25rem 0;
+}
+
+.place-website {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #667eea;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.place-website:hover {
+  text-decoration: underline;
+  color: #764ba2;
+}
+
+/* Loading Places */
+.loading-places {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.spinner-small {
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+/* No Places */
+.no-places {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.no-places button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #ffc107;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Map Container */
+.map-container {
+  flex: 1;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.map-container.full-map {
+  width: 100%;
+}
+
+/* Popup Styles */
+.popup-content {
+  max-width: 250px;
+}
+
+.popup-content h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.popup-content p {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.popup-content a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #667eea;
+  text-decoration: none;
+}
+
+.popup-content a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+
+/* Tablet Devices (768px - 1024px) */
+@media (max-width: 1024px) {
+  .places-sidebar {
+    width: 280px;
+  }
+  
+  .search-button,
+  .location-button,
+  .all-india-button,
+  .satellite-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .stats-bar {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile Devices (481px - 768px) */
+@media (max-width: 768px) {
+  .search-section {
+    padding: 0.75rem;
+  }
+  
+  .search-container {
+    flex-wrap: wrap;
+  }
+  
+  .search-input-wrapper {
+    min-width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .search-button,
+  .location-button,
+  .all-india-button,
+  .satellite-button {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .sidebar-toggle {
+    display: block;
+    flex: 1;
+  }
+  
+  .stats-bar {
+    font-size: 0.7rem;
+    gap: 0.5rem;
+  }
+  
+  .city-select {
+    font-size: 0.85rem;
+    padding: 0.6rem;
+  }
+  
+  .filter-section select {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
+  
+  .places-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    transform: translateX(-100%);
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .places-sidebar.mobile-sidebar {
+    transform: translateX(0);
+  }
+  
+  .close-sidebar {
+    display: block;
+  }
+  
+  .sidebar-header {
+    padding: 0.75rem;
+  }
+  
+  .sidebar-header h3 {
+    font-size: 1rem;
+  }
+  
+  .places-list {
+    padding: 0.75rem;
+  }
+  
+  .place-card {
+    padding: 0.75rem;
+  }
+  
+  .place-card h4 {
+    font-size: 0.9rem;
+  }
+  
+  .map-container {
+    width: 100%;
+  }
+  
+  .popup-content {
+    max-width: 200px;
+  }
+  
+  .popup-content h4 {
+    font-size: 0.9rem;
+  }
+  
+  .popup-content p {
+    font-size: 0.75rem;
+  }
+}
+
+/* Small Mobile Devices (up to 480px) */
+@media (max-width: 480px) {
+  .search-section {
+    padding: 0.5rem;
+  }
+  
+  .search-button,
+  .location-button,
+  .all-india-button,
+  .satellite-button,
+  .sidebar-toggle {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .stats-bar {
+    font-size: 0.6rem;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+  
+  .stats-bar span {
+    padding: 0.15rem 0.3rem;
+  }
+  
+  .city-select {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+  
+  .filter-section {
+    gap: 0.25rem;
+  }
+  
+  .filter-section select {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+  
+  .places-sidebar {
+    width: 260px;
+  }
+  
+  .sidebar-header h3 {
+    font-size: 0.9rem;
+  }
+  
+  .places-count {
+    font-size: 0.7rem;
+  }
+  
+  .place-card {
+    padding: 0.6rem;
+  }
+  
+  .place-card h4 {
+    font-size: 0.85rem;
+  }
+  
+  .place-location {
+    font-size: 0.75rem;
+  }
+  
+  .place-meta {
+    gap: 0.3rem;
+  }
+  
+  .place-type {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .place-description {
+    font-size: 0.7rem;
+  }
+  
+  .loading-spinner p {
+    font-size: 1rem;
+  }
+  
+  .error-message {
+    font-size: 0.8rem;
+    padding: 0.75rem;
+  }
+  
+  .error-message button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+  
+  .popup-content {
+    max-width: 180px;
+  }
+  
+  .popup-content h4 {
+    font-size: 0.85rem;
+  }
+  
+  .popup-content p {
+    font-size: 0.7rem;
+  }
+}
+
+/* Landscape Mode on Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .tourism-map-container {
+    height: 100vh;
+  }
+  
+  .search-section {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .places-sidebar {
+    width: 260px;
+  }
+  
+  .place-card {
+    padding: 0.5rem;
+  }
+  
+  .place-card h4 {
+    font-size: 0.8rem;
+  }
+  
+  .place-description {
+    display: none;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .search-button,
+  .location-button,
+  .all-india-button,
+  .satellite-button,
+  .sidebar-toggle,
+  .place-card,
+  .search-result-item {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .place-card:hover {
+    transform: none;
+  }
+  
+  .place-card:active {
+    background: #dee2e6;
+    transform: scale(0.98);
+  }
+}
+
+/* Ensure Map is Touch-Friendly */
+.leaflet-container {
+  touch-action: pan-x pan-y;
+  cursor: grab;
+}
+
+.leaflet-container:active {
+  cursor: grabbing;
+}
+
+/* Improve Scrollbar for Sidebar */
+.places-sidebar::-webkit-scrollbar,
+.search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.places-sidebar::-webkit-scrollbar-track,
+.search-results::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.places-sidebar::-webkit-scrollbar-thumb,
+.search-results::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.places-sidebar::-webkit-scrollbar-thumb:hover,
+.search-results::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation for Sidebar on Mobile */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.places-sidebar.mobile-sidebar {
+  animation: slideIn 0.3s ease;
+}
+
+/* High DPI Screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .search-input,
+  .city-select,
+  .filter-section select {
+    font-size: 16px; /* Prevents zoom on focus in iOS */
+  }
+}
