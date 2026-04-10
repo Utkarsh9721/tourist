@@ -1,6 +1,6 @@
 // src/components/History.js
 import React, { useEffect, useState } from 'react';
-import './history.css';
+import './map.css';
 
 const History = () => {
   const [selectedCity, setSelectedCity] = useState(null);
@@ -207,7 +207,7 @@ const History = () => {
             {/* Mumbai */}
             <div className="city-card" onClick={() => setSelectedCity('mumbai')}>
               <div className="city-image">
-                <img src="https://images.unsplash.com/photo-1570168007204-cefbce422cfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Mumbai" />
+                <img src="https://images.unsplash.com/photo-1569758267239-d08deb78bb1a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bXVtYmFpfGVufDB8fDB8fHww" alt="Mumbai" />
               </div>
               <div className="city-info">
                 <h3>Mumbai</h3>
@@ -255,7 +255,7 @@ const History = () => {
             {/* Goa */}
             <div className="city-card" onClick={() => setSelectedCity('goa')}>
               <div className="city-image">
-                <img src="https://images.unsplash.com/photo-1512343879784-960f40e4a1f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Goa" />
+                <img src="https://images.unsplash.com/photo-1581892197913-fd2e407e698a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGdvYXxlbnwwfHwwfHx8MA%3D%3D" alt="Goa" />
               </div>
               <div className="city-info">
                 <h3>Goa</h3>
@@ -271,7 +271,7 @@ const History = () => {
             {/* Ladakh */}
             <div className="city-card" onClick={() => setSelectedCity('ladakh')}>
               <div className="city-image">
-                <img src="https://images.unsplash.com/photo-1516172792-bf2250f5ec71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Ladakh" />
+                <img src="https://images.unsplash.com/photo-1635255506105-b74adbd94026?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fExhZGFraHxlbnwwfHwwfHx8MA%3D%3D" alt="Ladakh" />
               </div>
               <div className="city-info">
                 <h3>Ladakh</h3>
@@ -477,7 +477,7 @@ const History = () => {
             
             <div className="image-content">
               <img 
-                src="https://images.unsplash.com/photo-1593693399746-4d8ccd0b8e33?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                src="https://images.unsplash.com/photo-1682582036641-91dfe7b66ba6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Q29sb25pYWwlMjBIZXJpdGFnZSUyMC0lMjBWaWN0b3JpYSUyME1lbW9yaWFsJTJDJTIwS29sa2F0YXxlbnwwfHwwfHx8MA%3D%3D" 
                 alt="Colonial Architecture"
                 className="section-image"
               />
