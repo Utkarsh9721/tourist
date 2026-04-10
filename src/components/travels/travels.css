@@ -1,30 +1,52 @@
 /* src/components/travels.css */
 
 /* ========================================
-   VARIABLES & RESET
+   CSS RESET & BASE STYLES
    ======================================== */
-:root {
-  --primary-color: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --secondary-color: #10b981;
-  --dark-color: #1f2937;
-  --gray-color: #6b7280;
-  --light-gray: #f3f4f6;
-  --white: #ffffff;
-  --black: #000000;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  --border-radius: 12px;
-  --transition: all 0.3s ease;
-}
-
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* ========================================
+   VARIABLES (CSS Custom Properties)
+   ======================================== */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary: #10b981;
+  --secondary-dark: #059669;
+  --accent: #f59e0b;
+  --dark: #1f2937;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --white: #ffffff;
+  --black: #000000;
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms ease;
+  --transition-slow: 500ms ease;
 }
 
 /* ========================================
@@ -33,7 +55,22 @@
 .travels {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
+  padding: clamp(1rem, 5vw, 3rem);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle background pattern */
+.travels::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 /* ========================================
@@ -41,17 +78,23 @@
    ======================================== */
 .travels-header {
   text-align: center;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto 3rem;
-  animation: fadeInDown 0.6s ease;
+  animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
 .travels-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--white);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, #e0e7ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   margin-bottom: 1rem;
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .highlight {
@@ -60,12 +103,15 @@
   background-clip: text;
   color: transparent;
   position: relative;
+  display: inline-block;
 }
 
 .subtitle {
-  font-size: 1.1rem;
+  font-size: clamp(0.875rem, 4vw, 1.125rem);
   color: rgba(255, 255, 255, 0.9);
   font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 /* ========================================
@@ -73,67 +119,92 @@
    ======================================== */
 .places {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: clamp(0.5rem, 2vw, 1rem);
+  position: relative;
+  z-index: 1;
 }
 
 /* ========================================
-   CARD STYLES
+   CARD COMPONENT
    ======================================== */
 .card {
   background: var(--white);
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-  transition: var(--transition);
+  transition: all var(--transition-base);
   cursor: pointer;
-  animation: fadeInUp 0.5s ease backwards;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
   animation-delay: calc(var(--index, 0) * 0.05s);
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: 0;
+  border-radius: var(--radius-xl);
 }
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-2xl);
+}
+
+.card:hover::before {
+  opacity: 0.05;
 }
 
 /* Card Image */
 .card-image {
   position: relative;
-  height: 240px;
+  height: clamp(180px, 30vw, 240px);
   overflow: hidden;
-  background: var(--light-gray);
+  background: var(--gray-100);
+  cursor: pointer;
 }
 
 .card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: var(--transition);
+  transition: transform var(--transition-slow);
 }
 
 .card:hover .card-image img {
   transform: scale(1.1);
 }
 
-/* Card Rating */
+/* Card Rating Badge */
 .card-rating {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
   color: var(--white);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.25rem;
   z-index: 1;
+  transition: all var(--transition-fast);
+}
+
+.card:hover .card-rating {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.05);
 }
 
 .star {
@@ -143,40 +214,70 @@
 
 /* Card Content */
 .card-content {
-  padding: 1.25rem;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  position: relative;
+  z-index: 1;
+  background: var(--white);
 }
 
 .card-content h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--dark-color);
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  font-weight: 700;
+  color: var(--gray-800);
   margin-bottom: 0.5rem;
   line-height: 1.3;
+  transition: color var(--transition-fast);
+}
+
+.card:hover .card-content h3 {
+  color: var(--primary);
 }
 
 .location {
-  color: var(--gray-color);
-  font-size: 0.9rem;
+  color: var(--gray-500);
+  font-size: 0.875rem;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  transition: color var(--transition-fast);
 }
 
 .location::before {
   content: "📍";
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+}
+
+.card:hover .location {
+  color: var(--gray-600);
 }
 
 .card-content a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--primary-color);
+  color: var(--primary);
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.9rem;
-  transition: var(--transition);
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.card-content a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: width var(--transition-base);
+}
+
+.card-content a:hover::after {
+  width: 100%;
 }
 
 .card-content a:hover {
@@ -189,8 +290,10 @@
    ======================================== */
 .travel {
   text-align: center;
-  margin-top: 3rem;
-  padding: 2rem;
+  margin-top: clamp(2rem, 6vw, 4rem);
+  padding: clamp(1rem, 3vw, 2rem);
+  position: relative;
+  z-index: 1;
 }
 
 .find-more-btn {
@@ -198,22 +301,42 @@
   align-items: center;
   gap: 0.5rem;
   background: var(--white);
-  color: var(--primary-color);
-  padding: 1rem 2rem;
-  border-radius: 50px;
+  color: var(--primary);
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+  border-radius: 9999px;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: var(--transition);
+  font-weight: 700;
+  font-size: clamp(0.875rem, 3vw, 1rem);
+  transition: all var(--transition-base);
   box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.find-more-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: var(--primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  z-index: -1;
+}
+
+.find-more-btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .find-more-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
   gap: 0.75rem;
-  background: var(--white);
-  color: var(--primary-dark);
+  color: var(--white);
 }
 
 /* ========================================
@@ -262,28 +385,24 @@
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-/* Tablet */
-@media (max-width: 1024px) {
-  .travels {
-    padding: 1.5rem;
-  }
-  
-  .travels-header h1 {
-    font-size: 2rem;
-  }
-  
+/* Tablet Landscape */
+@media (min-width: 1024px) and (max-width: 1280px) {
   .places {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
-  
-  .card-image {
-    height: 220px;
+}
+
+/* Tablet Portrait */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .places {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .travels {
     padding: 1rem;
   }
@@ -292,48 +411,23 @@
     margin-bottom: 2rem;
   }
   
-  .travels-header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .subtitle {
-    font-size: 0.95rem;
-  }
-  
   .places {
     grid-template-columns: 1fr;
     gap: 1.25rem;
-    padding: 0.5rem;
   }
   
   .card-image {
     height: 200px;
   }
   
-  .card-content h3 {
-    font-size: 1rem;
-  }
-  
-  .location {
-    font-size: 0.85rem;
-  }
-  
   .find-more-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+    width: 100%;
+    justify-content: center;
   }
 }
 
 /* Small Mobile */
 @media (max-width: 480px) {
-  .travels-header h1 {
-    font-size: 1.2rem;
-  }
-  
-  .subtitle {
-    font-size: 0.85rem;
-  }
-  
   .card-image {
     height: 180px;
   }
@@ -342,56 +436,9 @@
     padding: 1rem;
   }
   
-  .card-content h3 {
-    font-size: 0.95rem;
-  }
-  
-  .find-more-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
-  }
-}
-
-/* ========================================
-   HOVER EFFECTS & INTERACTIONS
-   ======================================== */
-.card {
-  position: relative;
-}
-
-.card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  opacity: 0;
-  transition: var(--transition);
-  pointer-events: none;
-  border-radius: var(--border-radius);
-}
-
-.card:hover::after {
-  opacity: 0.05;
-}
-
-/* ========================================
-   LOADING STATE (Optional)
-   ======================================== */
-.loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
+  .card-rating {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
   }
 }
 
@@ -399,40 +446,46 @@
    DARK MODE SUPPORT
    ======================================== */
 @media (prefers-color-scheme: dark) {
+  :root {
+    --white: #1f2937;
+    --gray-100: #374151;
+    --gray-200: #4b5563;
+  }
+  
   .travels {
     background: linear-gradient(135deg, #1e1e2e, #2d2d44);
   }
   
   .card {
-    background: #1f2937;
+    background: var(--white);
+  }
+  
+  .card-content {
+    background: var(--white);
   }
   
   .card-content h3 {
-    color: #f3f4f6;
+    color: var(--gray-100);
   }
   
   .location {
-    color: #9ca3af;
+    color: var(--gray-400);
   }
   
   .find-more-btn {
-    background: #1f2937;
+    background: var(--white);
     color: var(--primary-light);
   }
   
   .find-more-btn:hover {
-    background: #1f2937;
-    color: var(--primary-color);
-  }
-  
-  .card-rating {
-    background: rgba(0, 0, 0, 0.8);
+    color: var(--white);
   }
 }
 
 /* ========================================
-   ACCESSIBILITY
+   ACCESSIBILITY & PERFORMANCE
    ======================================== */
+/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -440,30 +493,45 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Focus styles for keyboard navigation */
+/* Focus visible for keyboard navigation */
 .card-content a:focus-visible,
 .find-more-btn:focus-visible {
-  outline: 2px solid var(--primary-color);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* High contrast mode */
 @media (prefers-contrast: high) {
   .card {
-    border: 2px solid var(--dark-color);
+    border: 2px solid currentColor;
   }
   
   .card-rating {
-    background: var(--black);
-    border: 1px solid var(--white);
+    border: 1px solid currentColor;
   }
   
   .find-more-btn {
-    border: 2px solid var(--primary-color);
+    border: 2px solid currentColor;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .card:hover {
+    transform: none;
+  }
+  
+  .card:hover .card-image img {
+    transform: none;
+  }
+  
+  .find-more-btn:hover {
+    transform: none;
   }
 }
 
@@ -478,35 +546,42 @@
   
   .travels-header h1 {
     color: var(--black);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
   }
   
   .card {
     break-inside: avoid;
     box-shadow: none;
-    border: 1px solid #ddd;
+    border: 1px solid var(--gray-300);
   }
   
   .card-image {
     break-inside: avoid;
   }
   
-  .card-rating {
-    background: var(--light-gray);
-    color: var(--black);
-  }
-  
   .find-more-btn {
     border: 1px solid var(--black);
+    background: none;
     color: var(--black);
   }
   
-  .travel {
-    break-inside: avoid;
+  .card-rating {
+    background: var(--gray-100);
+    color: var(--black);
   }
 }
 
 /* ========================================
-   SCROLLBAR STYLING
+   LAZY LOADING OPTIMIZATION
+   ======================================== */
+.card-image img {
+  loading: lazy;
+}
+
+/* ========================================
+   CUSTOM SCROLLBAR
    ======================================== */
 ::-webkit-scrollbar {
   width: 10px;
@@ -514,13 +589,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--light-gray);
+  background: var(--gray-100);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
+  background: var(--primary);
   border-radius: 10px;
+  transition: background var(--transition-fast);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -529,42 +605,46 @@
 
 @media (prefers-color-scheme: dark) {
   ::-webkit-scrollbar-track {
-    background: #1f2937;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: var(--primary-dark);
+    background: var(--gray-700);
   }
 }
 
 /* ========================================
    UTILITY CLASSES
    ======================================== */
-.text-center {
-  text-align: center;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
-.mt-2 {
-  margin-top: 2rem;
+/* Performance optimizations */
+.card,
+.card-image img,
+.find-more-btn {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-.mb-2 {
-  margin-bottom: 2rem;
-}
-
-.hidden {
-  display: none;
-}
-
-/* Responsive font sizes */
-@media (max-width: 768px) {
-  html {
-    font-size: 14px;
+/* Loading skeleton animation (optional) */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
   }
 }
 
-@media (max-width: 480px) {
-  html {
-    font-size: 12px;
-  }
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
 }
