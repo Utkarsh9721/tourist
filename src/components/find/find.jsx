@@ -1,10 +1,10 @@
 // src/components/TourismMap.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-import '../find/find.css';
+import './find.css';
 
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,6 +30,10 @@ const natureIcon = createCustomIcon('blue');
 const religiousIcon = createCustomIcon('gold');
 const culturalIcon = createCustomIcon('violet');
 const accommodationIcon = createCustomIcon('orange');
+const hotelIcon = createCustomIcon('orange');
+const attractionIcon = createCustomIcon('green');
+const museumIcon = createCustomIcon('purple');
+const guestHouseIcon = createCustomIcon('brown');
 
 // Custom location icon
 const locationIcon = new L.Icon({
@@ -106,9 +110,10 @@ const TourismMap = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [tourismPlaces, setTourismPlaces] = useState([]);
-  const [mapCenter, setMapCenter] = useState([25.3176, 82.9739]); // Varanasi center
+  const [mapCenter, setMapCenter] = useState([25.3176, 82.9739]);
   const [mapZoom, setMapZoom] = useState(12);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [isSatelliteView, setIsSatelliteView] = useState(false);
   const [selectedState, setSelectedState] = useState('all');
@@ -116,15 +121,31 @@ const TourismMap = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [states, setStates] = useState(['all']);
-  const [categories, setCategories] = useState(['all']);
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({ total: 0, byCategory: {} });
+  const [stats, setStats] = useState({ total: 0, byType: {} });
   const [geoLocationSupported, setGeoLocationSupported] = useState(true);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isAutoLoading, setIsAutoLoading] = useState(true);
+  
   const mapRef = useRef(null);
+  const sidebarRef = useRef(null);
+  const observerRef = useRef(null);
+  const ITEMS_PER_PAGE = 20;
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  // Use hosted backend URL
+  const API_URL = 'https://places-api-ahrd.onrender.com/api';
+
+  const availableTypes = [
+    'all', 'hotel', 'attraction', 'guest_house', 'museum', 
+    'restaurant', 'temple', 'park', 'monument', 'fort'
+  ];
 
   // Check mobile and geolocation support
   useEffect(() => {
@@ -135,113 +156,253 @@ const TourismMap = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Check if geolocation is supported
     if (!navigator.geolocation) {
       setGeoLocationSupported(false);
-      console.log('Geolocation is not supported by this browser');
     }
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Load all data
-  const loadAllData = async () => {
-    setInitialLoading(true);
-    setError(null);
+  // Extract unique states and cities from places data
+  const extractFiltersFromData = (places) => {
+    const uniqueStates = new Set();
+    const citiesMap = new Map();
+    
+    places.forEach(place => {
+      if (place.state && place.state !== 'N/A' && place.state !== 'undefined') {
+        uniqueStates.add(place.state);
+      }
+      
+      if (place.city && place.city !== 'N/A' && place.city !== 'undefined' && 
+          place.state && place.state !== 'N/A' && place.state !== 'undefined') {
+        const key = `${place.city}|${place.state}`;
+        if (!citiesMap.has(key)) {
+          citiesMap.set(key, { city: place.city, state: place.state, count: 1 });
+        } else {
+          const existing = citiesMap.get(key);
+          existing.count++;
+          citiesMap.set(key, existing);
+        }
+      }
+    });
+    
+    setStates(['all', ...Array.from(uniqueStates).sort()]);
+    setCities(Array.from(citiesMap.values()).sort((a, b) => a.city.localeCompare(b.city)));
+  };
+
+  // Load data with pagination
+  const loadData = async (page = 1, append = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setInitialLoading(true);
+    }
     
     try {
-      // Load places
-      const placesRes = await axios.get(`${API_URL}/places?limit=500`);
-      if (placesRes.data.success) {
-        setTourismPlaces(placesRes.data.data);
-        setStats({
-          total: placesRes.data.pagination.total,
-          byCategory: placesRes.data.data.reduce((acc, place) => {
-            const cat = place.category || 'other';
-            acc[cat] = (acc[cat] || 0) + 1;
-            return acc;
-          }, {})
+      let url = `${API_URL}/places?page=${page}&limit=${ITEMS_PER_PAGE}`;
+      
+      if (selectedType && selectedType !== 'all') {
+        url += `&type=${encodeURIComponent(selectedType)}`;
+      }
+      if (selectedState && selectedState !== 'all') {
+        url += `&state=${encodeURIComponent(selectedState)}`;
+      }
+      if (selectedCity) {
+        url += `&city=${encodeURIComponent(selectedCity)}`;
+      }
+      
+      console.log('Fetching from hosted API:', url);
+      const response = await axios.get(url, {
+        timeout: 10000, // 10 second timeout
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.data.success) {
+        const newPlaces = response.data.places || [];
+        
+        if (append) {
+          setTourismPlaces(prev => {
+            const updated = [...prev, ...newPlaces];
+            console.log(`Total places after append: ${updated.length}`);
+            return updated;
+          });
+        } else {
+          setTourismPlaces(newPlaces);
+          // Only extract filters on first load
+          extractFiltersFromData(newPlaces);
+        }
+        
+        // Update pagination info
+        if (response.data.pagination) {
+          setCurrentPage(response.data.pagination.currentPage);
+          setTotalPages(response.data.pagination.totalPages);
+          setTotalItems(response.data.pagination.totalItems);
+          setHasMore(response.data.pagination.hasNextPage);
+          console.log('Pagination:', {
+            currentPage: response.data.pagination.currentPage,
+            totalPages: response.data.pagination.totalPages,
+            totalItems: response.data.pagination.totalItems,
+            hasNextPage: response.data.pagination.hasNextPage
+          });
+        }
+        
+        // Update stats
+        const allCurrentPlaces = append ? [...tourismPlaces, ...newPlaces] : newPlaces;
+        const byType = {};
+        allCurrentPlaces.forEach(place => {
+          const type = place.tags?.tourism || place.category || 'other';
+          byType[type] = (byType[type] || 0) + 1;
         });
-        console.log(`Loaded ${placesRes.data.data.length} places`);
+        
+        setStats({
+          total: response.data.pagination?.totalItems || newPlaces.length,
+          byType
+        });
+      } else {
+        throw new Error('API returned unsuccessful response');
       }
-      
-      // Load states
-      const statesRes = await axios.get(`${API_URL}/places/states/list`);
-      if (statesRes.data.success && statesRes.data.data.length > 0) {
-        setStates(['all', ...statesRes.data.data.map(s => s.state).filter(s => s)]);
-      }
-      
-      // Load categories
-      const categoriesRes = await axios.get(`${API_URL}/places/categories/list`);
-      if (categoriesRes.data.success && categoriesRes.data.data.length > 0) {
-        setCategories(['all', ...categoriesRes.data.data.map(c => c.category).filter(c => c)]);
-      }
-      
-      // Load cities
-      const citiesRes = await axios.get(`${API_URL}/places/cities/list`);
-      if (citiesRes.data.success && citiesRes.data.data.length > 0) {
-        setCities(citiesRes.data.data);
-      }
-      
     } catch (err) {
       console.error('Error loading data:', err);
-      setError('Failed to load tourism data. Please check if backend is running on port 5000');
+      setError(`Failed to load data: ${err.message}. Please check if the backend is running.`);
+      
+      // Show user-friendly error message
+      if (err.code === 'ECONNABORTED') {
+        setError('Connection timeout. Please check your internet connection and try again.');
+      } else if (err.response?.status === 404) {
+        setError('API endpoint not found. Please check if the backend is deployed correctly.');
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later.');
+      }
     } finally {
+      setLoading(false);
+      setLoadingMore(false);
       setInitialLoading(false);
     }
   };
 
-  // Load filtered data
-  const loadFilteredData = async (filters = {}) => {
-    setLoading(true);
-    
-    try {
-      let url = `${API_URL}/places?limit=500`;
-      if (filters.state && filters.state !== 'all') url += `&state=${encodeURIComponent(filters.state)}`;
-      if (filters.city) url += `&city=${encodeURIComponent(filters.city)}`;
-      if (filters.category && filters.category !== 'all') url += `&category=${encodeURIComponent(filters.category)}`;
-      
-      const response = await axios.get(url);
-      
-      if (response.data.success) {
-        setTourismPlaces(response.data.data);
-        
-        // Center map on first place if city selected
-        if (filters.city && response.data.data.length > 0) {
-          const place = response.data.data[0];
-          if (place.location?.coordinates) {
-            setMapCenter([place.location.coordinates[1], place.location.coordinates[0]]);
-            setMapZoom(13);
-          }
-        }
+  // Load next page manually
+  const loadNextPage = () => {
+    if (hasMore && !loadingMore && !loading) {
+      const nextPage = currentPage + 1;
+      if (nextPage <= totalPages) {
+        loadData(nextPage, true);
       }
-    } catch (err) {
-      console.error('Error loading filtered data:', err);
-      setError('Failed to load filtered data');
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Handle city selection
-  const handleCitySelect = async (cityName) => {
+  // Clear all filters and reset
+  const clearAllFilters = () => {
+    setSelectedType('all');
+    setSelectedState('all');
+    setSelectedCity('');
+    setSearchQuery('');
+    setSearchResults([]);
+    setCurrentPage(1);
+    setHasMore(true);
+    setTourismPlaces([]);
+    loadData(1, false);
+    
+    // Show success message
+    const message = document.createElement('div');
+    message.className = 'toast-message';
+    message.textContent = '✨ All filters cleared! Showing all places ✨';
+    document.body.appendChild(message);
+    setTimeout(() => message.remove(), 3000);
+  };
+
+  // Setup intersection observer for infinite scroll
+  const setupObserver = useCallback(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    if (!isAutoLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && hasMore && !loadingMore && !loading && tourismPlaces.length > 0) {
+          console.log('IntersectionObserver triggered - loading more pages');
+          loadNextPage();
+        }
+      },
+      {
+        root: sidebarRef.current,
+        rootMargin: '0px 0px 100px 0px',
+        threshold: 0.1
+      }
+    );
+
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (sentinel) {
+      observer.observe(sentinel);
+      observerRef.current = observer;
+    }
+  }, [hasMore, loadingMore, loading, tourismPlaces.length, isAutoLoading]);
+
+  // Re-setup observer when dependencies change
+  useEffect(() => {
+    if (!initialLoading && sidebarRef.current) {
+      setTimeout(setupObserver, 100);
+    }
+  }, [setupObserver, initialLoading, tourismPlaces.length, hasMore, isAutoLoading]);
+
+  // Cleanup observer
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  // Reset and reload when filters change
+  useEffect(() => {
+    if (!initialLoading) {
+      setCurrentPage(1);
+      setHasMore(true);
+      setTourismPlaces([]);
+      loadData(1, false);
+      
+      // Scroll to top when filters change
+      if (sidebarRef.current) {
+        sidebarRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [selectedType, selectedState, selectedCity]);
+
+  // Handle type selection
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    setSelectedState('all');
+    setSelectedCity('');
+  };
+
+  // Filter by state
+  const filterByState = (state) => {
+    setSelectedState(state);
+    setSelectedCity('');
+  };
+
+  // Filter by city
+  const filterByCity = (cityName) => {
     if (!cityName) {
       setSelectedCity('');
-      await loadAllData();
-      setMapCenter([25.3176, 82.9739]);
-      setMapZoom(12);
+      setSelectedState('all');
       return;
     }
     
     setSelectedCity(cityName);
-    await loadFilteredData({ 
-      city: cityName,
-      category: selectedType !== 'all' ? selectedType : undefined,
-      state: selectedState !== 'all' ? selectedState : undefined
-    });
+    const cityObj = cities.find(c => c.city === cityName);
+    if (cityObj) {
+      setSelectedState(cityObj.state);
+    }
   };
 
-  // Search location
+  // Search location using Nominatim
   const searchLocation = async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -273,51 +434,55 @@ const TourismMap = () => {
     setSearchResults([]);
     setSearchQuery(location.display_name);
     
-    // Try to find nearby places
+    // Load nearby places with pagination
     try {
-      const response = await axios.get(`${API_URL}/places/nearby/${coords[1]}/${coords[0]}`, {
-        params: { radius: 30 }
+      const response = await axios.get(`${API_URL}/nearby`, {
+        params: { 
+          lat: coords[0], 
+          lng: coords[1], 
+          maxDistance: 5000,
+          page: 1,
+          limit: ITEMS_PER_PAGE
+        },
+        timeout: 10000
       });
-      if (response.data.success && response.data.data.length > 0) {
-        setTourismPlaces(response.data.data);
+      
+      if (response.data.success) {
+        setTourismPlaces(response.data.places || []);
+        if (response.data.pagination) {
+          setCurrentPage(response.data.pagination.currentPage);
+          setTotalPages(response.data.pagination.totalPages);
+          setTotalItems(response.data.pagination.totalItems);
+          setHasMore(response.data.pagination.hasNextPage);
+        }
+        extractFiltersFromData(response.data.places || []);
+        
+        setSelectedState('all');
+        setSelectedCity('');
+        setSelectedType('all');
       }
     } catch (err) {
       console.error('Error finding nearby places:', err);
+      setError('Failed to find nearby places. Please try again.');
     }
   };
 
   // Show all places
-  const showAllPlaces = async () => {
-    setSelectedCity('');
-    setSelectedState('all');
-    setSelectedType('all');
-    await loadAllData();
+  const showAllPlaces = () => {
+    clearAllFilters();
     setMapCenter([25.3176, 82.9739]);
     setMapZoom(12);
     setSelectedLocation(null);
-    setSearchQuery('');
-    setSearchResults([]);
   };
 
-  // Get user location with better error handling
+  // Get user location
   const getUserLocation = () => {
     if (!geoLocationSupported) {
-      alert("Geolocation is not supported by your browser. Please search for a city instead.");
-      return;
-    }
-    
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser. Please search for a city instead.");
+      alert("Geolocation is not supported by your browser.");
       return;
     }
     
     setLoading(true);
-    
-    // Check if we're in a secure context (HTTPS or localhost)
-    const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
-    if (!isSecure) {
-      console.warn('Geolocation works best with HTTPS. You may need to allow location access manually.');
-    }
     
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -329,82 +494,60 @@ const TourismMap = () => {
         setMapCenter(coords);
         setMapZoom(13);
         
-        // Find nearby places
         try {
-          const response = await axios.get(`${API_URL}/places/nearby/${coords[1]}/${coords[0]}`, {
-            params: { radius: 30 }
+          const response = await axios.get(`${API_URL}/nearby`, {
+            params: { 
+              lat: coords[0], 
+              lng: coords[1], 
+              maxDistance: 5000,
+              page: 1,
+              limit: ITEMS_PER_PAGE
+            },
+            timeout: 10000
           });
-          if (response.data.success && response.data.data.length > 0) {
-            setTourismPlaces(response.data.data);
+          
+          if (response.data.success && response.data.places && response.data.places.length > 0) {
+            setTourismPlaces(response.data.places);
+            if (response.data.pagination) {
+              setCurrentPage(response.data.pagination.currentPage);
+              setTotalPages(response.data.pagination.totalPages);
+              setTotalItems(response.data.pagination.totalItems);
+              setHasMore(response.data.pagination.hasNextPage);
+            }
+            extractFiltersFromData(response.data.places);
+            
+            setSelectedState('all');
+            setSelectedCity('');
+            setSelectedType('all');
           } else {
             alert("No tourist places found near your location. Showing all places instead.");
-            await loadAllData();
+            loadData(1, false);
           }
         } catch (err) {
           console.error('Error finding nearby places:', err);
-          await loadAllData();
+          loadData(1, false);
         }
         
         setLoading(false);
       },
       (error) => {
         console.error("Geolocation error:", error);
-        let errorMessage = "";
-        
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please allow location access in your browser settings, or search for a city manually.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information is unavailable. Please search for a city manually.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out. Please try again or search for a city.";
-            break;
-          default:
-            errorMessage = "Unable to get your location. Please search for a city instead.";
-        }
-        
-        alert(errorMessage);
+        alert("Unable to get your location. Please check your browser permissions.");
         setLoading(false);
       },
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 60000
-      }
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
     );
   };
 
-  // Handle filters
-  const handleStateChange = async (state) => {
-    setSelectedState(state);
-    if (state === 'all') {
-      await loadFilteredData({ 
-        category: selectedType !== 'all' ? selectedType : undefined,
-        city: selectedCity || undefined
-      });
-    } else {
-      await loadFilteredData({ 
-        state,
-        category: selectedType !== 'all' ? selectedType : undefined,
-        city: selectedCity || undefined
-      });
-    }
-  };
-
-  const handleTypeChange = async (type) => {
-    setSelectedType(type);
-    await loadFilteredData({ 
-      category: type !== 'all' ? type : undefined,
-      state: selectedState !== 'all' ? selectedState : undefined,
-      city: selectedCity || undefined
-    });
-  };
-
-  // Get icon by category
-  const getIconForCategory = (category) => {
-    switch (category) {
+  // Get icon based on type
+  const getIconForPlace = (place) => {
+    const type = place.tags?.tourism || place.category;
+    
+    switch (type) {
+      case 'hotel': return hotelIcon;
+      case 'attraction': return attractionIcon;
+      case 'guest_house': return guestHouseIcon;
+      case 'museum': return museumIcon;
       case 'historical': return historicalIcon;
       case 'nature': return natureIcon;
       case 'religious': return religiousIcon;
@@ -414,9 +557,16 @@ const TourismMap = () => {
     }
   };
 
+  // Scroll to top of sidebar
+  const scrollToTop = () => {
+    if (sidebarRef.current) {
+      sidebarRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Initial load
   useEffect(() => {
-    loadAllData();
+    loadData(1, false);
   }, []);
 
   // Search debounce
@@ -431,14 +581,13 @@ const TourismMap = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Loading state
   if (initialLoading) {
     return (
       <div className="tourism-map-container loading">
         <div className="loading-spinner">
           <div className="spinner"></div>
           <p>Loading India Tourism Map...</p>
-          <p className="loading-subtitle">Fetching data from database...</p>
+          <p className="loading-subtitle">Connecting to hosted backend...</p>
         </div>
       </div>
     );
@@ -469,8 +618,14 @@ const TourismMap = () => {
             <button onClick={showAllPlaces} className="all-india-button">
               🗺️ All India
             </button>
+            <button onClick={clearAllFilters} className="clear-filters-button">
+              🧹 Clear Filters
+            </button>
             <button onClick={() => setIsSatelliteView(!isSatelliteView)} className="satellite-button">
               {isSatelliteView ? '🗺️ Map' : '🛰️ Satellite'}
+            </button>
+            <button onClick={() => setIsAutoLoading(!isAutoLoading)} className={`auto-load-button ${isAutoLoading ? 'active' : ''}`}>
+              {isAutoLoading ? '🔁 Auto' : '⏸️ Manual'}
             </button>
             {isMobile && (
               <button onClick={() => setShowSidebar(!showSidebar)} className="sidebar-toggle">
@@ -479,37 +634,39 @@ const TourismMap = () => {
             )}
           </div>
 
-          {/* Stats Bar */}
-          {stats.total > 0 && (
+          {totalItems > 0 && (
             <div className="stats-bar">
-              <span>📍 Total: <strong>{stats.total}</strong> places</span>
-              {Object.entries(stats.byCategory).slice(0, 5).map(([cat, count]) => (
-                <span key={cat} className={`stat-category ${cat}`}>
-                  {cat}: {count}
+              <span>📍 Total: <strong>{totalItems}</strong> places</span>
+              <span>📄 Page: <strong>{currentPage}</strong> of {totalPages}</span>
+              <span>📋 Showing: <strong>{tourismPlaces.length}</strong> places</span>
+              <span>📊 Loaded: <strong>{Math.round((tourismPlaces.length / totalItems) * 100)}%</strong></span>
+              {Object.entries(stats.byType).slice(0, 3).map(([type, count]) => (
+                <span key={type} className={`stat-type ${type}`}>
+                  {type}: {count}
                 </span>
               ))}
             </div>
           )}
 
-          {/* City Selector */}
-          <div className="city-selector-section">
-            <select 
-              value={selectedCity} 
-              onChange={(e) => handleCitySelect(e.target.value)}
-              className="city-select"
-            >
-              <option value="">-- Select a City to Explore --</option>
-              {cities.map(city => (
-                <option key={city.city} value={city.city}>
-                  {city.city} ({city.state}) - {city.count} places
-                </option>
-              ))}
-            </select>
-          </div>
+          {cities.length > 0 && (
+            <div className="city-selector-section">
+              <select 
+                value={selectedCity} 
+                onChange={(e) => filterByCity(e.target.value)}
+                className="city-select"
+              >
+                <option value="">-- Select a City to Explore --</option>
+                {cities.map(city => (
+                  <option key={`${city.city}-${city.state}`} value={city.city}>
+                    {city.city} ({city.state}) - {city.count} places
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          {/* Filters */}
           <div className="filter-section">
-            <select value={selectedState} onChange={(e) => handleStateChange(e.target.value)}>
+            <select value={selectedState} onChange={(e) => filterByState(e.target.value)}>
               {states.map(state => (
                 <option key={state} value={state}>
                   {state === 'all' ? 'All States' : state}
@@ -518,9 +675,9 @@ const TourismMap = () => {
             </select>
             
             <select value={selectedType} onChange={(e) => handleTypeChange(e.target.value)}>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Types' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+              {availableTypes.map(type => (
+                <option key={type} value={type}>
+                  {type === 'all' ? 'All Types' : type.replace('_', ' ').toUpperCase()}
                 </option>
               ))}
             </select>
@@ -529,7 +686,7 @@ const TourismMap = () => {
           {error && (
             <div className="error-message">
               <p>⚠️ {error}</p>
-              <button onClick={loadAllData}>Retry</button>
+              <button onClick={() => loadData(1, false)}>Retry</button>
             </div>
           )}
 
@@ -547,18 +704,27 @@ const TourismMap = () => {
 
         <div className="map-layout">
           {(showSidebar || !isMobile) && (
-            <div className={`places-sidebar ${isMobile ? 'mobile-sidebar' : ''}`}>
+            <div 
+              className={`places-sidebar ${isMobile ? 'mobile-sidebar' : ''}`}
+              ref={sidebarRef}
+              style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}
+            >
               <div className="sidebar-header">
                 <h3>
                   {selectedCity || (selectedState !== 'all' ? selectedState : 'India')}
-                  <span className="places-count"> ({tourismPlaces.length} places)</span>
+                  <span className="places-count"> ({totalItems} places)</span>
                 </h3>
-                {isMobile && (
-                  <button className="close-sidebar" onClick={() => setShowSidebar(false)}>×</button>
-                )}
+                <div className="sidebar-controls">
+                  <button onClick={scrollToTop} className="scroll-top-button" title="Scroll to top">
+                    ⬆️
+                  </button>
+                  {isMobile && (
+                    <button className="close-sidebar" onClick={() => setShowSidebar(false)}>×</button>
+                  )}
+                </div>
               </div>
               
-              {loading ? (
+              {loading && tourismPlaces.length === 0 ? (
                 <div className="loading-places">
                   <div className="spinner-small"></div>
                   <p>Loading places...</p>
@@ -566,49 +732,85 @@ const TourismMap = () => {
               ) : tourismPlaces.length === 0 ? (
                 <div className="no-places">
                   <p>No tourist places found</p>
-                  <button onClick={showAllPlaces}>Show All Places</button>
+                  <button onClick={() => loadData(1, false)}>Retry</button>
                 </div>
               ) : (
-                <div className="places-list">
-                  {tourismPlaces.map(place => (
-                    <div 
-                      key={place._id} 
-                      className="place-card"
-                      onClick={() => {
-                        if (place.location?.coordinates) {
-                          setMapCenter([place.location.coordinates[1], place.location.coordinates[0]]);
-                          setMapZoom(15);
-                          if (isMobile) setShowSidebar(false);
-                        }
-                      }}
-                    >
-                      <h4>{place.name}</h4>
-                      <p className="place-location">{place.city || 'Varanasi'}, {place.state || 'Uttar Pradesh'}</p>
-                      <div className="place-meta">
-                        <span className={`place-type ${place.category || 'other'}`}>
-                          {place.category || 'tourist'}
-                        </span>
-                        {place.type && (
-                          <span className="place-category">{place.type}</span>
-                        )}
-                        {place.rating > 0 && (
-                          <span className="place-rating">⭐ {place.rating}</span>
+                <>
+                  <div className="places-list">
+                    {tourismPlaces.map((place, index) => (
+                      <div 
+                        key={`${place._id}-${index}`} 
+                        className="place-card"
+                        onClick={() => {
+                          if (place.location?.coordinates) {
+                            setMapCenter([place.location.coordinates[1], place.location.coordinates[0]]);
+                            setMapZoom(15);
+                            if (isMobile) setShowSidebar(false);
+                          }
+                        }}
+                      >
+                        <h4>{place.name}</h4>
+                        <p className="place-location">{place.city || 'N/A'}, {place.state || 'N/A'}</p>
+                        <div className="place-meta">
+                          <span className={`place-type ${place.tags?.tourism || place.category || 'tourist'}`}>
+                            {place.tags?.tourism || place.category || 'tourist'}
+                          </span>
+                          {place.rating && place.rating > 0 && (
+                            <span className="place-rating">⭐ {place.rating}</span>
+                          )}
+                        </div>
+                        {place.description && (
+                          <p className="place-description">{place.description.substring(0, 100)}...</p>
                         )}
                       </div>
-                      {place.description && (
-                        <p className="place-description">{place.description.substring(0, 100)}...</p>
-                      )}
-                      {place.phone && (
-                        <p className="place-contact">📞 {place.phone}</p>
-                      )}
-                      {place.website && (
-                        <a href={place.website} target="_blank" rel="noopener noreferrer" className="place-website">
-                          🔗 Visit Website
-                        </a>
-                      )}
+                    ))}
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  <div className="pagination-controls">
+                    {currentPage > 1 && (
+                      <button onClick={scrollToTop} className="pagination-button">
+                        ⬆️ Scroll to Top
+                      </button>
+                    )}
+                    {hasMore && !loadingMore && (
+                      <button onClick={loadNextPage} className="pagination-button load-more-btn">
+                        📥 Load More ({currentPage}/{totalPages})
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Sentinel element for IntersectionObserver */}
+                  <div id="scroll-sentinel" style={{ height: '20px', margin: '10px 0' }}></div>
+                  
+                  {loadingMore && (
+                    <div className="loading-more">
+                      <div className="spinner-small"></div>
+                      <p>Loading more places...</p>
                     </div>
-                  ))}
-                </div>
+                  )}
+                  
+                  {!hasMore && totalItems > ITEMS_PER_PAGE && tourismPlaces.length === totalItems && (
+                    <div className="end-of-list">
+                      <p>✨ You've seen all {totalItems} places! ✨</p>
+                      <button onClick={scrollToTop} className="scroll-top-bottom-btn">
+                        ⬆️ Scroll to Top
+                      </button>
+                    </div>
+                  )}
+                  
+                  {hasMore && !loadingMore && tourismPlaces.length > 0 && isAutoLoading && (
+                    <div className="scroll-hint">
+                      <p>↓ Scroll down to load more places ↓</p>
+                    </div>
+                  )}
+                  
+                  {hasMore && !isAutoLoading && (
+                    <div className="manual-load-hint">
+                      <p>🔘 Auto-scroll is OFF. Click "Load More" to get more places.</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -642,15 +844,15 @@ const TourismMap = () => {
                   <Marker 
                     key={place._id} 
                     position={[place.location.coordinates[1], place.location.coordinates[0]]}
-                    icon={getIconForCategory(place.category)}
+                    icon={getIconForPlace(place)}
                   >
                     <Popup>
                       <div className="popup-content">
                         <h4>{place.name}</h4>
-                        <p><strong>📍 {place.city || 'Varanasi'}, {place.state || 'Uttar Pradesh'}</strong></p>
-                        {place.type && <p>🏷️ {place.type}</p>}
-                        {place.category && <p>🎯 {place.category}</p>}
+                        <p><strong>📍 {place.city || 'N/A'}, {place.state || 'N/A'}</strong></p>
+                        <p>🏷️ Type: {place.tags?.tourism || place.category || 'tourist'}</p>
                         {place.description && <p>{place.description.substring(0, 150)}</p>}
+                        {place.rating && place.rating > 0 && <p>⭐ Rating: {place.rating}</p>}
                         {place.phone && <p>📞 {place.phone}</p>}
                         {place.website && (
                           <a href={place.website} target="_blank" rel="noopener noreferrer">Visit Website</a>
