@@ -25,11 +25,15 @@
 }
 
 /* ========================================
-   MAIN CONTAINER
+   MAIN CONTAINER WITH NATURE BACKGROUND
    ======================================== */
 .book-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+              url('https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 2rem 1rem;
   display: flex;
   align-items: center;
@@ -38,6 +42,7 @@
   overflow-x: hidden;
 }
 
+/* Animated overlay effect */
 .book-container::before {
   content: '';
   position: absolute;
@@ -45,25 +50,61 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
-  background-size: cover;
-  opacity: 0.1;
+  background: linear-gradient(135deg, 
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(139, 92, 246, 0.15) 50%,
+    rgba(16, 185, 129, 0.1) 100%);
   pointer-events: none;
+  animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Floating particles effect */
+.book-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  animation: float 20s linear infinite;
+}
+
+@keyframes float {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-50px);
+  }
 }
 
 /* ========================================
-   CARD STYLES
+   CARD STYLES WITH GLASS EFFECT
    ======================================== */
 .book-card {
   max-width: 800px;
   width: 100%;
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-xl);
   overflow: hidden;
   animation: slideUp 0.5s ease;
   position: relative;
   z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 @keyframes slideUp {
@@ -85,6 +126,27 @@
   color: transparent;
   margin-bottom: 0;
   padding: 2rem 2rem 0 2rem;
+  position: relative;
+}
+
+/* Decorative leaf icon */
+.book-card h1::before {
+  content: '🌿';
+  position: absolute;
+  left: 2rem;
+  top: 2rem;
+  font-size: 1.5rem;
+  opacity: 0.3;
+  animation: sway 3s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
 }
 
 /* ========================================
@@ -108,8 +170,9 @@
   left: 40px;
   right: 40px;
   height: 2px;
-  background: var(--light-gray);
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
   z-index: 1;
+  opacity: 0.3;
 }
 
 .step {
@@ -138,7 +201,7 @@
 }
 
 .step.active .step-circle {
-  background: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   border-color: var(--primary-color);
   color: var(--white);
   transform: scale(1.1);
@@ -146,7 +209,7 @@
 }
 
 .step.completed .step-circle {
-  background: var(--secondary-color);
+  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
   border-color: var(--secondary-color);
   color: var(--white);
 }
@@ -200,6 +263,17 @@
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--light-gray);
+  position: relative;
+}
+
+.form-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
 .form-group {
@@ -252,23 +326,6 @@
   min-height: 100px;
 }
 
-/* Input with icon */
-.input-icon {
-  position: relative;
-}
-
-.input-icon input {
-  padding-left: 2.5rem;
-}
-
-.input-icon i {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--gray-color);
-}
-
 /* ========================================
    REVIEW SECTION
    ======================================== */
@@ -277,6 +334,18 @@
   border-radius: var(--border-radius);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.review-section::before {
+  content: '🌄';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 2rem;
+  opacity: 0.1;
+  pointer-events: none;
 }
 
 .review-section h3 {
@@ -314,6 +383,18 @@
   padding: 1rem;
   border-radius: 8px;
   margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cost-breakdown::before {
+  content: '💰';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 2rem;
+  opacity: 0.1;
+  pointer-events: none;
 }
 
 .cost-breakdown .review-item {
@@ -360,6 +441,26 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .btn-primary {
@@ -403,37 +504,6 @@
 }
 
 /* ========================================
-   ERROR & ALERT MESSAGES
-   ======================================== */
-.error-message {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #991b1b;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  border-left: 4px solid var(--danger-color);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-.success-message {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #065f46;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  border-left: 4px solid var(--secondary-color);
-}
-
-/* ========================================
    CONFIRMATION PAGE
    ======================================== */
 .confirmation-container {
@@ -451,6 +521,25 @@
   justify-content: center;
   margin: 0 auto 1.5rem;
   animation: scaleUp 0.5s ease;
+  position: relative;
+}
+
+.confirmation-icon::before {
+  content: '🌸';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  font-size: 1.5rem;
+  animation: bounce 2s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes scaleUp {
@@ -493,42 +582,18 @@
 }
 
 /* ========================================
-   LOADING STATES
-   ======================================== */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--white);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-/* Tablet */
 @media (max-width: 768px) {
   .book-card h1 {
     font-size: 1.5rem;
     padding: 1.5rem 1.5rem 0 1.5rem;
+  }
+  
+  .book-card h1::before {
+    font-size: 1rem;
+    left: 1.5rem;
+    top: 1.5rem;
   }
   
   .step-indicator {
@@ -558,16 +623,11 @@
     font-size: 0.85rem;
   }
   
-  .review-section {
-    padding: 1rem;
-  }
-  
   .confirmation-title {
     font-size: 1.4rem;
   }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
   .book-container {
     padding: 1rem;
@@ -576,6 +636,10 @@
   .book-card h1 {
     font-size: 1.2rem;
     padding: 1rem 1rem 0 1rem;
+  }
+  
+  .book-card h1::before {
+    display: none;
   }
   
   .step-indicator {
@@ -604,27 +668,10 @@
   
   .form-section h2 {
     font-size: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  
-  .form-group label {
-    font-size: 0.85rem;
-  }
-  
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.85rem;
   }
   
   .button-group {
     flex-direction: column;
-    gap: 0.75rem;
   }
   
   .btn {
@@ -637,113 +684,15 @@
     gap: 0.25rem;
   }
   
-  .review-value {
-    font-size: 0.9rem;
-  }
-  
-  .confirmation-container {
-    padding: 2rem 1rem;
-  }
-  
   .confirmation-title {
     font-size: 1.2rem;
-  }
-  
-  .booking-id {
-    font-size: 0.9rem;
-  }
-}
-
-/* Small Mobile */
-@media (max-width: 375px) {
-  .step-label {
-    display: none;
-  }
-  
-  .steps::before {
-    display: none;
-  }
-  
-  .step-circle {
-    margin: 0 auto;
-  }
-}
-
-/* ========================================
-   ANIMATIONS & EFFECTS
-   ======================================== */
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-input:invalid:focus {
-  border-color: var(--danger-color);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--light-gray);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
-}
-
-/* Print styles */
-@media print {
-  .book-container {
-    background: white;
-    padding: 0;
-  }
-  
-  .btn,
-  .button-group,
-  .step-indicator {
-    display: none;
-  }
-  
-  .book-card {
-    box-shadow: none;
-    padding: 0;
-  }
-  
-  .review-section {
-    background: white;
-    border: 1px solid #ddd;
   }
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --white: #1f2937;
-    --light-gray: #374151;
-    --dark-color: #f3f4f6;
-    --gray-color: #9ca3af;
-  }
-  
   .book-card {
-    background: var(--white);
+    background: rgba(31, 41, 55, 0.95);
   }
   
   .form-group input,
@@ -758,32 +707,38 @@ input:invalid:focus {
     background: #374151;
   }
   
-  .booking-id {
-    background: #374151;
-  }
-  
+  .booking-id,
   .booking-details {
     background: #374151;
   }
 }
 
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+/* Print styles */
+@media print {
+  .book-container {
+    background: white;
+    padding: 0;
   }
-}
-
-/* Focus visible for keyboard navigation */
-.btn:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+  
+  .book-container::before,
+  .book-container::after {
+    display: none;
+  }
+  
+  .btn,
+  .button-group,
+  .step-indicator {
+    display: none;
+  }
+  
+  .book-card {
+    box-shadow: none;
+    padding: 0;
+    background: white;
+  }
+  
+  .review-section {
+    background: white;
+    border: 1px solid #ddd;
+  }
 }
