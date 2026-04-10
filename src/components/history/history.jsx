@@ -1,6 +1,6 @@
 // src/components/History.js
 import React, { useEffect, useState } from 'react';
-import './map.css';
+import './history.css';
 
 const History = () => {
   const [selectedCity, setSelectedCity] = useState(null);
