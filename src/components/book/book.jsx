@@ -1,3 +1,4 @@
+// src/components/Book.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./book.css";
@@ -34,7 +35,11 @@ const Book = () => {
         Delhi: 5000,
         Mumbai: 5500,
         Bangalore: 4800,
-        Goa: 6500
+        Goa: 6500,
+        Jaipur: 4500,
+        Varanasi: 4200,
+        Kerala: 6000,
+        Ladakh: 8000
       };
       
       const vehiclePrice = {
@@ -49,17 +54,24 @@ const Book = () => {
         premium: 2000
       };
       
+      const accommodationPrice = {
+        budget: 1500,
+        standard: 3000,
+        luxury: 8000
+      };
+      
       const cityCost = basePrice[formData.city] || 5000;
       const vehicleCost = vehiclePrice[formData.vehicle] || 0;
       const guideCost = guidePrice[formData.guide] || 0;
+      const accommodationCost = (accommodationPrice[formData.accommodation] || 0) * formData.duration;
       const travelersCost = (formData.travelers - 1) * 2000;
       
-      const total = (cityCost + vehicleCost + guideCost + travelersCost) * formData.duration;
+      const total = (cityCost + vehicleCost + guideCost + travelersCost) * formData.duration + accommodationCost;
       setEstimatedCost(total);
     };
     
     calculateCost();
-  }, [formData.city, formData.vehicle, formData.guide, formData.travelers, formData.duration]);
+  }, [formData.city, formData.vehicle, formData.guide, formData.travelers, formData.duration, formData.accommodation]);
 
   // Handle form submission with backend API
   const handleSubmit = async (e) => {
@@ -71,6 +83,18 @@ const Book = () => {
       // Validate required fields
       if (!formData.name || !formData.email || !formData.phone || !formData.city || !formData.date) {
         throw new Error("Please fill in all required fields");
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error("Please enter a valid email address");
+      }
+      
+      // Validate phone number
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(formData.phone.replace(/[^0-9]/g, ''))) {
+        throw new Error("Please enter a valid 10-digit phone number");
       }
       
       // Prepare data for backend
@@ -85,7 +109,8 @@ const Book = () => {
       const response = await axios.post(`${API_URL}/bookings`, bookingData, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 10000
       });
       
       // Get booking ID from response
@@ -97,7 +122,15 @@ const Book = () => {
       
     } catch (err) {
       console.error("Booking submission error:", err);
-      setError(err.response?.data?.message || err.message || "Failed to submit booking. Please try again.");
+      if (err.response?.status === 409) {
+        setError("A booking with these details already exists. Please check your email for confirmation.");
+      } else if (err.response?.status === 400) {
+        setError(err.response.data.message || "Invalid booking details. Please check your information.");
+      } else if (err.code === 'ECONNABORTED') {
+        setError("Connection timeout. Please check your internet connection and try again.");
+      } else {
+        setError(err.response?.data?.message || err.message || "Failed to submit booking. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -120,38 +153,76 @@ const Book = () => {
     setShowConfirmation(false);
     setCurrentStep(1);
     setError("");
+    setEstimatedCost(0);
   };
 
   const nextStep = () => {
+    // Validate current step before proceeding
+    if (currentStep === 1) {
+      if (!formData.name || !formData.email || !formData.phone) {
+        setError("Please fill in all personal details");
+        return;
+      }
+    } else if (currentStep === 2) {
+      if (!formData.city || !formData.date || !formData.travelers || !formData.duration) {
+        setError("Please fill in all trip details");
+        return;
+      }
+    }
+    setError("");
     if (currentStep < 4) setCurrentStep(prev => prev + 1);
   };
 
   const prevStep = () => {
+    setError("");
     if (currentStep > 1) setCurrentStep(prev => prev - 1);
   };
 
+  // Confirmation Page
   if (showConfirmation) {
     return (
       <div className="book-container">
         <div className="book-card">
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <h1 style={{ color: 'green' }}>✅ Booking Submitted!</h1>
-            <p>Booking ID: <strong>{bookingId}</strong></p>
-            <p>Estimated Cost: <strong>₹{estimatedCost.toLocaleString()}</strong></p>
-            <p>We'll contact you within 24 hours.</p>
-            <button 
-              onClick={resetForm}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                marginTop: '20px',
-                cursor: 'pointer'
-              }}
-            >
-              Book Another Trip
+          <div className="confirmation-container">
+            <div className="confirmation-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17L4 12" />
+              </svg>
+            </div>
+            <h1 className="confirmation-title">Booking Confirmed! 🎉</h1>
+            <p>Your adventure is almost here! We've received your booking.</p>
+            
+            <div className="booking-details">
+              <div className="review-item">
+                <span className="review-label">Booking ID:</span>
+                <span className="booking-id">{bookingId}</span>
+              </div>
+              <div className="review-item">
+                <span className="review-label">Total Amount:</span>
+                <span className="review-value" style={{color: '#10b981', fontWeight: 'bold', fontSize: '1.2rem'}}>
+                  ₹{estimatedCost.toLocaleString()}
+                </span>
+              </div>
+              <div className="review-item">
+                <span className="review-label">Destination:</span>
+                <span className="review-value">{formData.city}</span>
+              </div>
+              <div className="review-item">
+                <span className="review-label">Travel Date:</span>
+                <span className="review-value">{formData.date}</span>
+              </div>
+              <div className="review-item">
+                <span className="review-label">Travelers:</span>
+                <span className="review-value">{formData.travelers}</span>
+              </div>
+            </div>
+            
+            <p style={{ marginTop: '1rem', color: '#666' }}>
+              We'll send confirmation details to <strong>{formData.email}</strong> within 24 hours.
+            </p>
+            
+            <button onClick={resetForm} className="btn btn-primary" style={{ marginTop: '2rem' }}>
+              Plan Another Trip ✈️
             </button>
           </div>
         </div>
@@ -159,369 +230,299 @@ const Book = () => {
     );
   }
 
+  // Main Booking Form
   return (
     <div className="book-container">
       <div className="book-card">
-        <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
-          Book Your Adventure
-        </h1>
+        <h1>Book Your Adventure</h1>
         
-        {/* Error Message */}
-        {error && (
-          <div style={{
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            padding: '10px',
-            borderRadius: '4px',
-            marginBottom: '20px',
-            border: '1px solid #f5c6cb'
-          }}>
-            {error}
+        {/* Step Indicator */}
+        <div className="step-indicator">
+          <div className="steps">
+            {[1, 2, 3, 4].map(step => (
+              <div key={step} className={`step ${currentStep === step ? 'active' : ''} ${currentStep > step ? 'completed' : ''}`}>
+                <div className="step-circle">
+                  {currentStep > step ? '✓' : step}
+                </div>
+                <div className="step-label">
+                  {step === 1 && 'Personal'}
+                  {step === 2 && 'Trip'}
+                  {step === 3 && 'Add-ons'}
+                  {step === 4 && 'Review'}
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-        
-        {/* Simple Step Indicator */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          marginBottom: '30px'
-        }}>
-          {[1, 2, 3, 4].map(step => (
-            <div key={step} style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: currentStep >= step ? '#007bff' : '#ddd',
-                color: currentStep >= step ? 'white' : '#666',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 10px',
-                fontWeight: 'bold'
-              }}>
-                {step}
-              </div>
-              <div style={{ fontSize: '12px' }}>
-                {step === 1 && 'Personal'}
-                {step === 2 && 'Trip'}
-                {step === 3 && 'Add-ons'}
-                {step === 4 && 'Review'}
-              </div>
-            </div>
-          ))}
         </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Step 1 */}
+        <form className="book-form" onSubmit={handleSubmit}>
+          {/* Error Message */}
+          {error && (
+            <div className="error-message">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Step 1 - Personal Information */}
           {currentStep === 1 && (
-            <div>
+            <div className="form-section">
               <h2>Personal Information</h2>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Full Name *</label>
+              <div className="form-group">
+                <label className="required">Full Name</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
+                  placeholder="Enter your full name"
                   required
                 />
               </div>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Email *</label>
+              <div className="form-group">
+                <label className="required">Email Address</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
+                  placeholder="you@example.com"
                   required
                 />
               </div>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Phone *</label>
+              <div className="form-group">
+                <label className="required">Phone Number</label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
+                  placeholder="9876543210"
                   required
                 />
+                <small style={{ color: '#666', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>
+                  Enter 10-digit mobile number
+                </small>
               </div>
             </div>
           )}
 
-          {/* Step 2 */}
+          {/* Step 2 - Trip Details */}
           {currentStep === 2 && (
-            <div>
+            <div className="form-section">
               <h2>Trip Details</h2>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Destination City *</label>
+              <div className="form-group">
+                <label className="required">Destination City</label>
                 <select
                   value={formData.city}
                   onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
                   required
                 >
-                  <option value="">Select city</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Mumbai">Mumbai</option>
-                  <option value="Bangalore">Bangalore</option>
-                  <option value="Goa">Goa</option>
+                  <option value="">Select destination</option>
+                  <option value="Delhi">Delhi - The Capital</option>
+                  <option value="Mumbai">Mumbai - The City of Dreams</option>
+                  <option value="Bangalore">Bangalore - Silicon Valley</option>
+                  <option value="Goa">Goa - Beach Paradise</option>
+                  <option value="Jaipur">Jaipur - Pink City</option>
+                  <option value="Varanasi">Varanasi - Spiritual Capital</option>
+                  <option value="Kerala">Kerala - God's Own Country</option>
+                  <option value="Ladakh">Ladakh - Land of High Passes</option>
                 </select>
               </div>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Travel Date *</label>
+              <div className="form-group">
+                <label className="required">Travel Date</label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
+                  min={new Date().toISOString().split('T')[0]}
                   required
                 />
               </div>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Number of Travelers *</label>
+              <div className="form-group">
+                <label className="required">Number of Travelers</label>
                 <input
                   type="number"
                   min="1"
                   max="20"
                   value={formData.travelers}
                   onChange={(e) => setFormData({...formData, travelers: parseInt(e.target.value)})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
                   required
                 />
               </div>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Duration (days) *</label>
+              <div className="form-group">
+                <label className="required">Duration (Days)</label>
                 <input
                   type="number"
                   min="1"
                   max="30"
                   value={formData.duration}
                   onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
                   required
                 />
               </div>
             </div>
           )}
 
-          {/* Step 3 */}
+          {/* Step 3 - Add-ons */}
           {currentStep === 3 && (
-            <div>
-              <h2>Add-ons</h2>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Vehicle Type</label>
+            <div className="form-section">
+              <h2>Add-ons & Preferences</h2>
+              <div className="form-group">
+                <label>Vehicle Rental</label>
                 <select
                   value={formData.vehicle}
                   onChange={(e) => setFormData({...formData, vehicle: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
                 >
-                  <option value="">Select vehicle</option>
-                  <option value="car">Car (₹2000)</option>
-                  <option value="suv">SUV (₹3500)</option>
-                  <option value="bus">Bus (₹5000)</option>
+                  <option value="">No vehicle needed</option>
+                  <option value="car">🚗 Car (₹2000/day)</option>
+                  <option value="suv">🚙 SUV (₹3500/day)</option>
+                  <option value="bus">🚌 Mini Bus (₹5000/day)</option>
                 </select>
               </div>
-              <div style={{ marginBottom: '15px' }}>
+              <div className="form-group">
                 <label>Tour Guide</label>
                 <select
                   value={formData.guide}
                   onChange={(e) => setFormData({...formData, guide: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
                 >
-                  <option value="none">No Guide</option>
-                  <option value="basic">Basic Guide (₹1000/day)</option>
-                  <option value="premium">Premium Guide (₹2000/day)</option>
+                  <option value="none">No guide needed</option>
+                  <option value="basic">👤 Basic Guide (₹1000/day)</option>
+                  <option value="premium">👥 Premium Guide (₹2000/day)</option>
                 </select>
               </div>
-              <div style={{ marginBottom: '15px' }}>
+              <div className="form-group">
                 <label>Accommodation</label>
                 <select
                   value={formData.accommodation}
                   onChange={(e) => setFormData({...formData, accommodation: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
                 >
-                  <option value="">No Accommodation</option>
-                  <option value="budget">Budget Hotel</option>
-                  <option value="standard">Standard Hotel</option>
-                  <option value="luxury">Luxury Hotel</option>
+                  <option value="">No accommodation needed</option>
+                  <option value="budget">🏨 Budget Hotel (₹1500/night)</option>
+                  <option value="standard">🏩 Standard Hotel (₹3000/night)</option>
+                  <option value="luxury">🏰 Luxury Resort (₹8000/night)</option>
                 </select>
               </div>
-              <div style={{ marginBottom: '15px' }}>
-                <label>Special Requests (Optional)</label>
+              <div className="form-group">
+                <label>Special Requests</label>
                 <textarea
                   value={formData.specialRequests}
                   onChange={(e) => setFormData({...formData, specialRequests: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    marginTop: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    minHeight: '100px'
-                  }}
-                  placeholder="Any special requirements or preferences?"
+                  placeholder="Any special requirements, dietary restrictions, or preferences? (e.g., wheelchair access, vegetarian food, etc.)"
+                  rows="4"
                 />
               </div>
             </div>
           )}
 
-          {/* Step 4 */}
+          {/* Step 4 - Review */}
           {currentStep === 4 && (
-            <div>
-              <h2>Review & Submit</h2>
-              <div style={{
-                backgroundColor: '#f5f5f5',
-                padding: '20px',
-                borderRadius: '8px',
-                marginBottom: '20px'
-              }}>
+            <div className="form-section">
+              <h2>Review Your Booking</h2>
+              
+              <div className="review-section">
                 <h3>Personal Details</h3>
-                <p><strong>Name:</strong> {formData.name}</p>
-                <p><strong>Email:</strong> {formData.email}</p>
-                <p><strong>Phone:</strong> {formData.phone}</p>
-                
+                <div className="review-item">
+                  <span className="review-label">Name:</span>
+                  <span className="review-value">{formData.name}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Email:</span>
+                  <span className="review-value">{formData.email}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Phone:</span>
+                  <span className="review-value">{formData.phone}</span>
+                </div>
+              </div>
+
+              <div className="review-section">
                 <h3>Trip Details</h3>
-                <p><strong>Destination:</strong> {formData.city}</p>
-                <p><strong>Date:</strong> {formData.date}</p>
-                <p><strong>Travelers:</strong> {formData.travelers}</p>
-                <p><strong>Duration:</strong> {formData.duration} days</p>
-                
+                <div className="review-item">
+                  <span className="review-label">Destination:</span>
+                  <span className="review-value">{formData.city}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Travel Date:</span>
+                  <span className="review-value">{new Date(formData.date).toLocaleDateString('en-IN')}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Travelers:</span>
+                  <span className="review-value">{formData.travelers} {formData.travelers === 1 ? 'person' : 'people'}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Duration:</span>
+                  <span className="review-value">{formData.duration} {formData.duration === 1 ? 'day' : 'days'}</span>
+                </div>
+              </div>
+
+              <div className="review-section">
                 <h3>Add-ons</h3>
-                <p><strong>Vehicle:</strong> {formData.vehicle || "Not selected"}</p>
-                <p><strong>Guide:</strong> {formData.guide === "none" ? "No guide" : formData.guide}</p>
-                <p><strong>Accommodation:</strong> {formData.accommodation || "Not selected"}</p>
-                
+                <div className="review-item">
+                  <span className="review-label">Vehicle:</span>
+                  <span className="review-value">{formData.vehicle ? formData.vehicle.toUpperCase() : 'Not selected'}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Guide:</span>
+                  <span className="review-value">{formData.guide === 'none' ? 'No guide' : formData.guide.toUpperCase()}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Accommodation:</span>
+                  <span className="review-value">{formData.accommodation ? formData.accommodation.toUpperCase() : 'Not selected'}</span>
+                </div>
                 {formData.specialRequests && (
-                  <>
-                    <h3>Special Requests</h3>
-                    <p>{formData.specialRequests}</p>
-                  </>
+                  <div className="review-item">
+                    <span className="review-label">Special Requests:</span>
+                    <span className="review-value">{formData.specialRequests}</span>
+                  </div>
                 )}
-                
-                <h3>Estimated Cost</h3>
-                <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
-                  ₹{estimatedCost.toLocaleString()}
-                </p>
-                <p style={{ fontSize: '12px', color: '#666' }}>
-                  *Final price may vary based on availability and season
-                </p>
+              </div>
+
+              <div className="cost-breakdown">
+                <h3>Cost Breakdown</h3>
+                <div className="review-item">
+                  <span className="review-label">Base Package:</span>
+                  <span className="review-value">₹{Math.round(estimatedCost / formData.duration).toLocaleString()}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-label">Duration:</span>
+                  <span className="review-value">{formData.duration} days</span>
+                </div>
+                {formData.accommodation && (
+                  <div className="review-item">
+                    <span className="review-label">Accommodation:</span>
+                    <span className="review-value">Included</span>
+                  </div>
+                )}
+                <div className="total-cost">
+                  Total Amount: ₹{estimatedCost.toLocaleString()}
+                </div>
+                <small style={{ display: 'block', marginTop: '0.5rem', opacity: 0.8 }}>
+                  *Final price may vary based on availability and seasonal changes
+                </small>
               </div>
             </div>
           )}
 
           {/* Navigation Buttons */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: '30px'
-          }}>
-            <button
-              type="button"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: currentStep === 1 ? '#ddd' : '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: currentStep === 1 ? 'not-allowed' : 'pointer'
-              }}
-            >
-              Previous
-            </button>
+          <div className="button-group">
+            {currentStep > 1 && (
+              <button type="button" onClick={prevStep} className="btn btn-secondary">
+                ← Previous
+              </button>
+            )}
             
             {currentStep < 4 ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Next
+              <button type="button" onClick={nextStep} className="btn btn-primary">
+                Next Step →
               </button>
             ) : (
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: isSubmitting ? '#6c757d' : '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: isSubmitting ? 'not-allowed' : 'pointer'
-                }}
-              >
-                {isSubmitting ? 'Submitting...' : `Submit Booking (₹${estimatedCost.toLocaleString()})`}
+              <button type="submit" disabled={isSubmitting} className="btn btn-success">
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-small" style={{ display: 'inline-block', marginRight: '8px' }}></span>
+                    Processing...
+                  </>
+                ) : (
+                  `Confirm Booking (₹${estimatedCost.toLocaleString()})`
+                )}
               </button>
             )}
           </div>
