@@ -24,7 +24,9 @@
   --transition: all 0.3s ease;
 }
 
-/* Main Container */
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
 .book-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -33,9 +35,25 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow-x: hidden;
 }
 
-/* Card */
+.book-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+  background-size: cover;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* ========================================
+   CARD STYLES
+   ======================================== */
 .book-card {
   max-width: 800px;
   width: 100%;
@@ -44,16 +62,8 @@
   box-shadow: var(--shadow-xl);
   overflow: hidden;
   animation: slideUp 0.5s ease;
-}
-
-.book-card h1 {
-  font-size: 2rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  padding: 2rem 2rem 0 2rem;
-  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes slideUp {
@@ -67,7 +77,19 @@
   }
 }
 
-/* Step Indicator */
+.book-card h1 {
+  font-size: 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 0;
+  padding: 2rem 2rem 0 2rem;
+}
+
+/* ========================================
+   STEP INDICATOR
+   ======================================== */
 .step-indicator {
   padding: 2rem 2rem 0 2rem;
 }
@@ -111,6 +133,8 @@
   font-size: 1.1rem;
   color: var(--gray-color);
   transition: var(--transition);
+  position: relative;
+  background: var(--white);
 }
 
 .step.active .step-circle {
@@ -144,7 +168,13 @@
   font-weight: 600;
 }
 
-/* Form Styles */
+.step.completed .step-label {
+  color: var(--secondary-color);
+}
+
+/* ========================================
+   FORM STYLES
+   ======================================== */
 .book-form {
   padding: 0 2rem 2rem 2rem;
 }
@@ -200,6 +230,7 @@
   font-size: 0.95rem;
   transition: var(--transition);
   font-family: inherit;
+  background: var(--white);
 }
 
 .form-group input:focus,
@@ -210,7 +241,37 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* Review Section */
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: var(--primary-light);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Input with icon */
+.input-icon {
+  position: relative;
+}
+
+.input-icon input {
+  padding-left: 2.5rem;
+}
+
+.input-icon i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-color);
+}
+
+/* ========================================
+   REVIEW SECTION
+   ======================================== */
 .review-section {
   background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
   border-radius: var(--border-radius);
@@ -247,12 +308,11 @@
   font-weight: 500;
 }
 
-/* Cost Breakdown */
 .cost-breakdown {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: var(--white);
-  padding: 1.5rem;
-  border-radius: var(--border-radius);
+  padding: 1rem;
+  border-radius: 8px;
   margin-top: 1rem;
 }
 
@@ -266,17 +326,20 @@
 
 .cost-breakdown .review-value {
   color: var(--white);
+  font-weight: 600;
 }
 
 .total-cost {
   font-size: 1.5rem;
   font-weight: bold;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   text-align: right;
   color: var(--secondary-color);
 }
 
-/* Buttons */
+/* ========================================
+   BUTTONS
+   ======================================== */
 .button-group {
   display: flex;
   justify-content: space-between;
@@ -329,12 +392,19 @@
   box-shadow: var(--shadow-lg);
 }
 
+.btn-danger {
+  background: var(--danger-color);
+  color: var(--white);
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Error Message */
+/* ========================================
+   ERROR & ALERT MESSAGES
+   ======================================== */
 .error-message {
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #991b1b;
@@ -354,7 +424,18 @@
   75% { transform: translateX(5px); }
 }
 
-/* Confirmation Page */
+.success-message {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--secondary-color);
+}
+
+/* ========================================
+   CONFIRMATION PAGE
+   ======================================== */
 .confirmation-container {
   text-align: center;
   padding: 3rem 2rem;
@@ -401,7 +482,6 @@
   margin: 1rem 0;
   font-family: monospace;
   font-size: 1.1rem;
-  font-weight: bold;
 }
 
 .booking-details {
@@ -412,11 +492,26 @@
   text-align: left;
 }
 
-/* Spinner */
-.spinner-small {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+/* ========================================
+   LOADING STATES
+   ======================================== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-top-color: var(--white);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -426,7 +521,10 @@
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+/* Tablet */
 @media (max-width: 768px) {
   .book-card h1 {
     font-size: 1.5rem;
@@ -443,6 +541,10 @@
     font-size: 0.9rem;
   }
   
+  .step-label {
+    font-size: 0.65rem;
+  }
+  
   .book-form {
     padding: 0 1.5rem 1.5rem 1.5rem;
   }
@@ -456,14 +558,78 @@
     font-size: 0.85rem;
   }
   
+  .review-section {
+    padding: 1rem;
+  }
+  
   .confirmation-title {
     font-size: 1.4rem;
   }
 }
 
+/* Mobile */
 @media (max-width: 480px) {
+  .book-container {
+    padding: 1rem;
+  }
+  
+  .book-card h1 {
+    font-size: 1.2rem;
+    padding: 1rem 1rem 0 1rem;
+  }
+  
+  .step-indicator {
+    padding: 1rem 1rem 0 1rem;
+  }
+  
+  .steps::before {
+    top: 16px;
+    left: 30px;
+    right: 30px;
+  }
+  
+  .step-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  
   .step-label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
+  }
+  
+  .book-form {
+    padding: 0 1rem 1rem 1rem;
+  }
+  
+  .form-section h2 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    font-size: 0.85rem;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
   }
   
   .review-item {
@@ -471,12 +637,153 @@
     gap: 0.25rem;
   }
   
-  .button-group {
-    flex-direction: column;
+  .review-value {
+    font-size: 0.9rem;
   }
   
-  .btn {
-    width: 100%;
-    justify-content: center;
+  .confirmation-container {
+    padding: 2rem 1rem;
   }
+  
+  .confirmation-title {
+    font-size: 1.2rem;
+  }
+  
+  .booking-id {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 375px) {
+  .step-label {
+    display: none;
+  }
+  
+  .steps::before {
+    display: none;
+  }
+  
+  .step-circle {
+    margin: 0 auto;
+  }
+}
+
+/* ========================================
+   ANIMATIONS & EFFECTS
+   ======================================== */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+input:invalid:focus {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Print styles */
+@media print {
+  .book-container {
+    background: white;
+    padding: 0;
+  }
+  
+  .btn,
+  .button-group,
+  .step-indicator {
+    display: none;
+  }
+  
+  .book-card {
+    box-shadow: none;
+    padding: 0;
+  }
+  
+  .review-section {
+    background: white;
+    border: 1px solid #ddd;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --white: #1f2937;
+    --light-gray: #374151;
+    --dark-color: #f3f4f6;
+    --gray-color: #9ca3af;
+  }
+  
+  .book-card {
+    background: var(--white);
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: #374151;
+    border-color: #4b5563;
+    color: var(--dark-color);
+  }
+  
+  .review-section {
+    background: #374151;
+  }
+  
+  .booking-id {
+    background: #374151;
+  }
+  
+  .booking-details {
+    background: #374151;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
