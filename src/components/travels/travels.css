@@ -1,46 +1,45 @@
 /* src/components/travels.css */
 
 /* ========================================
-   CSS RESET & BASE STYLES
+   VARIABLES & RESET
    ======================================== */
-*,
-*::before,
-*::after {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* ========================================
-   VARIABLES
-   ======================================== */
 :root {
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-light: #3b82f6;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #60a5fa;
   --secondary: #10b981;
+  --secondary-dark: #059669;
   --accent: #f59e0b;
   --dark: #0f172a;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-300: #d1d5db;
+  --gray-200: #e5e7eb;
+  --gray-100: #f3f4f6;
   --white: #ffffff;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
-  --transition: all 0.3s ease;
+  --radius-2xl: 1.5rem;
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms ease;
+  --transition-slow: 500ms ease;
 }
 
 /* ========================================
@@ -48,8 +47,33 @@
    ======================================== */
 .travels {
   min-height: 100vh;
-  background: var(--gray-50);
-  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: clamp(1rem, 5vw, 3rem);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated background pattern */
+.travels::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
+  pointer-events: none;
+  animation: slowZoom 20s ease infinite;
+}
+
+@keyframes slowZoom {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* ========================================
@@ -59,26 +83,36 @@
   text-align: center;
   max-width: 800px;
   margin: 0 auto 3rem;
+  animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
 .travels-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--gray-900);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--white);
   margin-bottom: 1rem;
   line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .highlight {
-  color: var(--primary);
+  background: linear-gradient(135deg, #ffd89b, #c7e9fb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   position: relative;
   display: inline-block;
 }
 
 .subtitle {
-  font-size: 1.125rem;
-  color: var(--gray-600);
+  font-size: clamp(0.875rem, 4vw, 1.125rem);
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 /* ========================================
@@ -86,10 +120,12 @@
    ======================================== */
 .places {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* ========================================
@@ -97,35 +133,71 @@
    ======================================== */
 .card {
   background: var(--white);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
   cursor: pointer;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  animation-delay: calc(var(--index, 0) * 0.05s);
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-2xl);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 /* Card Image */
 .card-image {
   position: relative;
-  height: 240px;
+  height: clamp(180px, 30vw, 240px);
   overflow: hidden;
   background: var(--gray-100);
+  cursor: pointer;
 }
 
 .card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: var(--transition);
+  transition: transform var(--transition-slow);
 }
 
 .card:hover .card-image img {
-  transform: scale(1.05);
+  transform: scale(1.1);
+}
+
+/* Card Overlay Gradient */
+.card-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.card:hover .card-image::after {
+  opacity: 1;
 }
 
 /* Card Rating Badge */
@@ -133,16 +205,23 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: var(--white);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
-  color: var(--gray-700);
+  color: var(--white);
   font-size: 0.875rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  box-shadow: var(--shadow-sm);
+  z-index: 1;
+  transition: all var(--transition-fast);
+}
+
+.card:hover .card-rating {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.05);
 }
 
 .star {
@@ -152,15 +231,23 @@
 
 /* Card Content */
 .card-content {
-  padding: 1.25rem;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  position: relative;
+  z-index: 1;
+  background: var(--white);
 }
 
 .card-content h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  font-weight: 700;
   color: var(--gray-800);
   margin-bottom: 0.5rem;
   line-height: 1.3;
+  transition: color var(--transition-fast);
+}
+
+.card:hover .card-content h3 {
+  color: var(--primary);
 }
 
 .location {
@@ -170,11 +257,16 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  transition: color var(--transition-fast);
 }
 
 .location::before {
   content: "📍";
   font-size: 0.875rem;
+}
+
+.card:hover .location {
+  color: var(--gray-600);
 }
 
 .card-content a {
@@ -183,9 +275,26 @@
   gap: 0.5rem;
   color: var(--primary);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
-  transition: var(--transition);
+  transition: all var(--transition-fast);
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.card-content a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: width var(--transition-base);
+}
+
+.card-content a:hover::after {
+  width: 100%;
 }
 
 .card-content a:hover {
@@ -198,65 +307,125 @@
    ======================================== */
 .travel {
   text-align: center;
-  margin-top: 3rem;
+  margin-top: clamp(2rem, 6vw, 4rem);
+  padding: clamp(1rem, 3vw, 2rem);
+  position: relative;
+  z-index: 1;
 }
 
 .find-more-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--primary);
-  color: var(--white);
-  padding: 0.875rem 2rem;
+  background: var(--white);
+  color: var(--primary);
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
   border-radius: 9999px;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: var(--transition);
-  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+  font-size: clamp(0.875rem, 3vw, 1rem);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.find-more-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  z-index: -1;
+}
+
+.find-more-btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .find-more-btn:hover {
-  background: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-xl);
   gap: 0.75rem;
+  color: var(--white);
 }
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animation for cards */
+.card:nth-child(1) { --index: 1; }
+.card:nth-child(2) { --index: 2; }
+.card:nth-child(3) { --index: 3; }
+.card:nth-child(4) { --index: 4; }
+.card:nth-child(5) { --index: 5; }
+.card:nth-child(6) { --index: 6; }
+.card:nth-child(7) { --index: 7; }
+.card:nth-child(8) { --index: 8; }
+.card:nth-child(9) { --index: 9; }
+.card:nth-child(10) { --index: 10; }
+.card:nth-child(11) { --index: 11; }
+.card:nth-child(12) { --index: 12; }
+.card:nth-child(13) { --index: 13; }
+.card:nth-child(14) { --index: 14; }
+.card:nth-child(15) { --index: 15; }
+.card:nth-child(16) { --index: 16; }
 
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-/* Tablet */
-@media (max-width: 1024px) {
-  .travels {
-    padding: 2rem 1.5rem;
-  }
-  
-  .travels-header h1 {
-    font-size: 2rem;
-  }
-  
+/* Tablet Landscape */
+@media (min-width: 1024px) and (max-width: 1280px) {
   .places {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Tablet Portrait */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .places {
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .travels {
-    padding: 1.5rem 1rem;
+    padding: 1rem;
   }
   
   .travels-header {
     margin-bottom: 2rem;
-  }
-  
-  .travels-header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .subtitle {
-    font-size: 1rem;
   }
   
   .places {
@@ -269,17 +438,13 @@
   }
   
   .find-more-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
+    width: 100%;
+    justify-content: center;
   }
 }
 
 /* Small Mobile */
 @media (max-width: 480px) {
-  .travels-header h1 {
-    font-size: 1.25rem;
-  }
-  
   .card-image {
     height: 180px;
   }
@@ -288,8 +453,9 @@
     padding: 1rem;
   }
   
-  .card-content h3 {
-    font-size: 1rem;
+  .card-rating {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
   }
 }
 
@@ -297,32 +463,28 @@
    DARK MODE SUPPORT
    ======================================== */
 @media (prefers-color-scheme: dark) {
-  .travels {
-    background: var(--gray-900);
-  }
-  
-  .travels-header h1 {
-    color: var(--white);
-  }
-  
-  .subtitle {
-    color: var(--gray-400);
-  }
-  
   .card {
     background: var(--gray-800);
   }
   
+  .card-content {
+    background: var(--gray-800);
+  }
+  
   .card-content h3 {
-    color: var(--white);
+    color: var(--gray-100);
   }
   
   .location {
     color: var(--gray-400);
   }
   
-  .card-rating {
-    background: var(--gray-700);
+  .find-more-btn {
+    background: var(--gray-800);
+    color: var(--primary-light);
+  }
+  
+  .find-more-btn:hover {
     color: var(--white);
   }
 }
@@ -330,6 +492,7 @@
 /* ========================================
    ACCESSIBILITY
    ======================================== */
+/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -337,14 +500,46 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
+/* Focus visible for keyboard navigation */
 .card-content a:focus-visible,
 .find-more-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid currentColor;
+  }
+  
+  .card-rating {
+    border: 1px solid currentColor;
+  }
+  
+  .find-more-btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .card:hover {
+    transform: none;
+  }
+  
+  .card:hover .card-image img {
+    transform: none;
+  }
+  
+  .find-more-btn:hover {
+    transform: none;
+  }
 }
 
 /* ========================================
@@ -356,16 +551,37 @@
     padding: 1rem;
   }
   
+  .travels::before {
+    display: none;
+  }
+  
+  .travels-header h1 {
+    color: var(--gray-900);
+  }
+  
   .card {
     break-inside: avoid;
     box-shadow: none;
     border: 1px solid var(--gray-300);
   }
   
+  .card-image {
+    break-inside: avoid;
+  }
+  
   .find-more-btn {
+    border: 1px solid var(--gray-900);
     background: none;
-    border: 1px solid var(--gray-300);
-    color: var(--gray-800);
+    color: var(--gray-900);
+  }
+  
+  .find-more-btn::before {
+    display: none;
+  }
+  
+  .card-rating {
+    background: var(--gray-100);
+    color: var(--gray-900);
   }
 }
 
@@ -373,64 +589,43 @@
    CUSTOM SCROLLBAR
    ======================================== */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--gray-100);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--gray-400);
-  border-radius: 4px;
+  background: var(--primary);
+  border-radius: 10px;
+  transition: background var(--transition-fast);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-500);
+  background: var(--primary-dark);
 }
 
 @media (prefers-color-scheme: dark) {
   ::-webkit-scrollbar-track {
     background: var(--gray-800);
   }
-  
-  ::-webkit-scrollbar-thumb {
-    background: var(--gray-600);
-  }
 }
 
 /* ========================================
-   ANIMATIONS
+   PERFORMANCE OPTIMIZATIONS
    ======================================== */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.card,
+.card-image img,
+.find-more-btn {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-.card {
-  animation: fadeInUp 0.4s ease backwards;
+/* Lazy loading optimization */
+.card-image img {
+  loading: lazy;
 }
-
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.1s; }
-.card:nth-child(3) { animation-delay: 0.15s; }
-.card:nth-child(4) { animation-delay: 0.2s; }
-.card:nth-child(5) { animation-delay: 0.25s; }
-.card:nth-child(6) { animation-delay: 0.3s; }
-.card:nth-child(7) { animation-delay: 0.35s; }
-.card:nth-child(8) { animation-delay: 0.4s; }
-.card:nth-child(9) { animation-delay: 0.45s; }
-.card:nth-child(10) { animation-delay: 0.5s; }
-.card:nth-child(11) { animation-delay: 0.55s; }
-.card:nth-child(12) { animation-delay: 0.6s; }
-.card:nth-child(13) { animation-delay: 0.65s; }
-.card:nth-child(14) { animation-delay: 0.7s; }
-.card:nth-child(15) { animation-delay: 0.75s; }
-.card:nth-child(16) { animation-delay: 0.8s; }
