@@ -1,12 +1,22 @@
 /* src/components/travels.css */
 
 /* ========================================
-   VARIABLES & RESET
+   PERFORMANCE CRITICAL RESET
    ======================================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 :root {
@@ -31,79 +41,65 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
-  --transition-slow: 400ms ease;
 }
 
 /* ========================================
-   MAIN CONTAINER - DARK NATURE BACKGROUND
+   MAIN CONTAINER - FIXED BACKGROUND
    ======================================== */
 .travels {
   min-height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  background: #0a0e27;
   padding: clamp(1rem, 5vw, 3rem);
   position: relative;
   overflow-x: hidden;
-  will-change: transform;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Animated overlay for depth */
+/* Static gradient background (no animation to prevent lag) */
 .travels::before {
   content: '';
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 70%);
-  pointer-events: none;
-  animation: subtlePulse 8s ease-in-out infinite;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  z-index: -2;
 }
 
-@keyframes subtlePulse {
-  0%, 100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-/* Subtle particle effect */
+/* Static nature image (no animation) */
 .travels::after {
   content: '';
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(circle at 20% 40%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: 0.15;
+  z-index: -1;
   pointer-events: none;
 }
 
 /* ========================================
-   HEADER SECTION - PERFORMANCE OPTIMIZED
+   HEADER SECTION
    ======================================== */
 .travels-header {
   text-align: center;
   max-width: 800px;
   margin: 0 auto 3rem;
   position: relative;
-  z-index: 1;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  z-index: 2;
 }
 
 .travels-header h1 {
@@ -115,30 +111,20 @@
   color: transparent;
   margin-bottom: 1rem;
   line-height: 1.2;
-  letter-spacing: -0.02em;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .highlight {
-  background: linear-gradient(135deg, #ffd89b, #c7e9fb, #a5f3fc);
+  background: linear-gradient(135deg, #ffd89b, #c7e9fb);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  position: relative;
-  display: inline-block;
 }
 
 .subtitle {
   font-size: clamp(0.875rem, 4vw, 1.125rem);
   color: rgba(255, 255, 255, 0.85);
-  font-weight: 400;
   max-width: 600px;
   margin: 0 auto;
-  backdrop-filter: blur(5px);
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.1);
 }
 
 /* ========================================
@@ -151,9 +137,7 @@
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
-  z-index: 1;
-  transform: translateZ(0);
-  scroll-behavior: smooth;
+  z-index: 2;
 }
 
 /* ========================================
@@ -161,74 +145,38 @@
    ======================================== */
 .card {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   position: relative;
-  transform: translateZ(0);
   will-change: transform;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.1));
-  opacity: 0;
-  transition: opacity var(--transition-base);
-  z-index: 0;
-  pointer-events: none;
-}
-
 .card:hover {
-  transform: translateY(-6px) translateZ(0);
-  box-shadow: var(--shadow-2xl);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.2);
 }
 
-.card:hover::before {
-  opacity: 1;
-}
-
-/* Card Image - Optimized for performance */
+/* Card Image */
 .card-image {
   position: relative;
   height: clamp(180px, 30vw, 240px);
   overflow: hidden;
-  background: var(--gray-800);
-  transform: translateZ(0);
+  background: #1e293b;
 }
 
 .card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  transition: transform 0.3s ease;
   will-change: transform;
 }
 
 .card:hover .card-image img {
-  transform: scale(1.08);
-}
-
-/* Gradient overlay for better text readability */
-.card-image::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
-  opacity: 0;
-  transition: opacity var(--transition-base);
-  pointer-events: none;
-}
-
-.card:hover .card-image::after {
-  opacity: 1;
+  transform: scale(1.05);
 }
 
 /* Card Rating Badge */
@@ -237,99 +185,61 @@
   top: 1rem;
   right: 1rem;
   background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
-  color: var(--white);
+  color: white;
   font-size: 0.875rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.25rem;
   z-index: 1;
-  transition: transform var(--transition-fast);
-}
-
-.card:hover .card-rating {
-  transform: scale(1.05);
 }
 
 .star {
   color: #fbbf24;
-  font-size: 1rem;
 }
 
 /* Card Content */
 .card-content {
   padding: clamp(1rem, 4vw, 1.5rem);
-  position: relative;
-  z-index: 1;
-  background: transparent;
 }
 
 .card-content h3 {
   font-size: clamp(1rem, 4vw, 1.2rem);
   font-weight: 700;
-  color: var(--gray-800);
+  color: #1e293b;
   margin-bottom: 0.5rem;
   line-height: 1.3;
-  transition: color var(--transition-fast);
-}
-
-.card:hover .card-content h3 {
-  color: var(--primary);
 }
 
 .location {
-  color: var(--gray-600);
+  color: #64748b;
   font-size: 0.875rem;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  transition: color var(--transition-fast);
 }
 
 .location::before {
   content: "📍";
-  font-size: 0.875rem;
-}
-
-.card:hover .location {
-  color: var(--gray-700);
 }
 
 .card-content a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--primary);
+  color: #3b82f6;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.875rem;
-  transition: all var(--transition-fast);
-  padding: 0.5rem 0;
-  position: relative;
-}
-
-.card-content a::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--primary);
-  transition: width var(--transition-base);
-}
-
-.card-content a:hover::after {
-  width: 100%;
+  transition: gap 0.2s ease;
 }
 
 .card-content a:hover {
   gap: 0.75rem;
-  color: var(--primary-dark);
 }
 
 /* ========================================
@@ -340,62 +250,53 @@
   margin-top: clamp(2rem, 6vw, 4rem);
   padding: clamp(1rem, 3vw, 2rem);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .find-more-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: var(--white);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
   padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
   border-radius: 9999px;
   text-decoration: none;
   font-weight: 700;
   font-size: clamp(0.875rem, 3vw, 1rem);
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  overflow: hidden;
-  transform: translateZ(0);
-}
-
-.find-more-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.find-more-btn:hover::before {
-  width: 300px;
-  height: 300px;
+  transition: transform 0.2s ease, gap 0.2s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .find-more-btn:hover {
-  transform: translateY(-2px) translateZ(0);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
   gap: 0.75rem;
 }
 
 /* ========================================
-   SMOOTH SCROLLING UTILITIES
+   SMOOTH SCROLLING FIXES
    ======================================== */
 html {
   scroll-behavior: smooth;
 }
 
+/* Prevent layout shifts during scroll */
+.places,
+.card,
+.card-image {
+  contain: layout style paint;
+}
+
+/* GPU acceleration for smooth scrolling */
+.card,
+.card-image img {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-/* Tablet Landscape */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .places {
     grid-template-columns: repeat(3, 1fr);
@@ -403,7 +304,6 @@ html {
   }
 }
 
-/* Tablet Portrait */
 @media (min-width: 768px) and (max-width: 1023px) {
   .places {
     grid-template-columns: repeat(2, 1fr);
@@ -411,11 +311,9 @@ html {
   }
 }
 
-/* Mobile */
 @media (max-width: 767px) {
   .travels {
     padding: 1rem;
-    background-attachment: scroll;
   }
   
   .travels-header {
@@ -427,29 +325,15 @@ html {
     gap: 1.25rem;
   }
   
-  .card-image {
-    height: 200px;
-  }
-  
   .find-more-btn {
     width: 100%;
     justify-content: center;
   }
 }
 
-/* Small Mobile */
 @media (max-width: 480px) {
   .card-image {
-    height: 180px;
-  }
-  
-  .card-content {
-    padding: 1rem;
-  }
-  
-  .card-rating {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.6rem;
+    height: 200px;
   }
 }
 
@@ -458,87 +342,41 @@ html {
    ======================================== */
 @media (prefers-color-scheme: dark) {
   .card {
-    background: rgba(31, 41, 55, 0.95);
+    background: rgba(30, 41, 59, 0.95);
   }
   
   .card-content h3 {
-    color: var(--gray-100);
+    color: #f1f5f9;
   }
   
   .location {
-    color: var(--gray-400);
+    color: #94a3b8;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
   }
   
-  .find-more-btn {
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  .card:hover .card-image img {
+    transform: none;
+  }
+  
+  .find-more-btn:hover {
+    transform: none;
   }
 }
 
-/* ========================================
-   ACCESSIBILITY & PERFORMANCE
-   ======================================== */
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Focus visible for keyboard navigation */
+/* Focus styles */
 .card-content a:focus-visible,
 .find-more-btn:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid #3b82f6;
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-/* GPU Acceleration for smoother animations */
-.card,
-.card-image,
-.card-image img,
-.find-more-btn {
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-/* Prevent layout shifts */
-.places {
-  contain: layout style paint;
-}
-
-/* Lazy loading optimization */
-.card-image img {
-  loading: lazy;
-  content-visibility: auto;
-}
-
-/* ========================================
-   CUSTOM SCROLLBAR
-   ======================================== */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 10px;
-  transition: background var(--transition-fast);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-light);
+  border-radius: 0.375rem;
 }
 
 /* ========================================
@@ -558,22 +396,33 @@ html {
   .card {
     break-inside: avoid;
     box-shadow: none;
-    border: 1px solid var(--gray-300);
-    background: white;
+    border: 1px solid #ddd;
   }
   
   .find-more-btn {
-    border: 1px solid var(--gray-900);
     background: none;
-    color: var(--gray-900);
+    border: 1px solid #000;
+    color: #000;
   }
 }
 
 /* ========================================
-   SMOOTH SCROLLING FIX FOR IOS
+   CUSTOM SCROLLBAR
    ======================================== */
-@supports (-webkit-touch-callout: none) {
-  .travels {
-    background-attachment: scroll;
-  }
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
 }
