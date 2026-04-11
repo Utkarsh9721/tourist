@@ -47,19 +47,22 @@
   --radius-xl: 1rem;
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
+  --header-height: 70px; /* Define header height */
 }
 
 /* ========================================
-   MAIN CONTAINER - FIXED BACKGROUND
+   MAIN CONTAINER - FIXED FOR HEADER
    ======================================== */
 .travels {
   min-height: 100vh;
   background: #0a0e27;
   padding: clamp(1rem, 5vw, 3rem);
+  padding-top: calc(var(--header-height) + 1rem); /* Add space for fixed header */
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  margin-top: 0;
 }
 
 /* Static gradient background (no animation to prevent lag) */
@@ -92,7 +95,7 @@
 }
 
 /* ========================================
-   HEADER SECTION
+   HEADER SECTION - WITH TOP PADDING
    ======================================== */
 .travels-header {
   text-align: center;
@@ -278,6 +281,7 @@
    ======================================== */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height); /* Important for anchor links */
 }
 
 /* Prevent layout shifts during scroll */
@@ -312,17 +316,22 @@ html {
 }
 
 @media (max-width: 767px) {
+  :root {
+    --header-height: 60px;
+  }
+  
   .travels {
-    padding: 1rem;
+    padding: 0.75rem;
+    padding-top: calc(var(--header-height) + 0.75rem);
   }
   
   .travels-header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .places {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1rem;
   }
   
   .find-more-btn {
@@ -332,8 +341,52 @@ html {
 }
 
 @media (max-width: 480px) {
+  :root {
+    --header-height: 55px;
+  }
+  
+  .travels {
+    padding: 0.5rem;
+    padding-top: calc(var(--header-height) + 0.5rem);
+  }
+  
   .card-image {
     height: 200px;
+  }
+  
+  .travels-header h1 {
+    font-size: 1.2rem;
+  }
+  
+  .subtitle {
+    font-size: 0.85rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 380px) {
+  :root {
+    --header-height: 50px;
+  }
+  
+  .travels {
+    padding-top: calc(var(--header-height) + 0.5rem);
+  }
+  
+  .card-image {
+    height: 180px;
+  }
+  
+  .card-content {
+    padding: 0.75rem;
+  }
+  
+  .card-content h3 {
+    font-size: 0.9rem;
+  }
+  
+  .location {
+    font-size: 0.75rem;
   }
 }
 
@@ -386,6 +439,7 @@ html {
   .travels {
     background: white;
     padding: 1rem;
+    padding-top: 1rem;
   }
   
   .travels::before,
@@ -425,4 +479,19 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #2563eb;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+/* Ensure first element after header has proper spacing */
+.first-element {
+  scroll-margin-top: var(--header-height);
+}
+
+/* Fix for any absolute positioned elements */
+.fixed-header-offset {
+  position: relative;
+  top: var(--header-height);
+  margin-bottom: var(--header-height);
 }
