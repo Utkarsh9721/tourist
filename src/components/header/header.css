@@ -4,44 +4,62 @@
    VARIABLES & RESET
    ======================================== */
 :root {
-  --primary-color: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --secondary-color: #10b981;
-  --dark-color: #1f2937;
-  --dark-bg: #111827;
-  --gray-color: #6b7280;
-  --light-gray: #f3f4f6;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #60a5fa;
+  --secondary: #10b981;
+  --dark: #0f172a;
+  --dark-bg: #0f172a;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
   --white: #ffffff;
-  --black: #000000;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ========================================
    HEADER STYLES
    ======================================== */
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   z-index: 1000;
   transition: var(--transition);
+  transform: translateY(0);
 }
 
 .header.scrolled {
   background: rgba(255, 255, 255, 0.98);
-  box-shadow: var(--shadow-lg);
-  padding: 0.5rem 0;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
 }
 
+.header.scroll-down {
+  transform: translateY(-100%);
+}
+
+.header.scroll-up {
+  transform: translateY(0);
+}
+
+/* ========================================
+   HEADER CONTAINER
+   ======================================== */
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -59,6 +77,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  text-decoration: none;
   cursor: pointer;
   transition: var(--transition);
   z-index: 1001;
@@ -69,16 +88,15 @@
 }
 
 .logo {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  animation: fadeIn 0.5s ease;
 }
 
 .site-name {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -86,19 +104,8 @@
   margin: 0;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 /* ========================================
-   THREE DOTS MENU (Mobile)
+   THREE DOTS MENU (MOBILE)
    ======================================== */
 .menu-icon {
   display: none;
@@ -106,12 +113,17 @@
   padding: 0.5rem;
   z-index: 1001;
   transition: var(--transition);
-  background: var(--light-gray);
+  background: var(--gray-100);
   border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .menu-icon:hover {
-  background: #e5e7eb;
+  background: var(--gray-200);
   transform: scale(1.05);
 }
 
@@ -119,9 +131,9 @@
   display: block;
   width: 6px;
   height: 6px;
-  background: var(--dark-color);
+  background: var(--gray-700);
   border-radius: 50%;
-  margin: 4px 0;
+  margin: 3px 0;
   transition: var(--transition);
 }
 
@@ -148,7 +160,7 @@
 
 .navbar a {
   text-decoration: none;
-  color: var(--dark-color);
+  color: var(--gray-700);
   font-weight: 500;
   font-size: 1rem;
   padding: 0.5rem 0;
@@ -164,7 +176,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
   transform: scaleX(0);
   transition: transform 0.3s ease;
   transform-origin: right;
@@ -176,13 +188,13 @@
 }
 
 .navbar a:hover {
-  color: var(--primary-color);
-  transform: translateY(-2px);
+  color: var(--primary);
 }
 
 /* Active link styling */
 .navbar a.active {
-  color: var(--primary-color);
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .navbar a.active::before {
@@ -194,24 +206,30 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: none;
+  background: var(--gray-100);
   border: none;
-  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
   cursor: pointer;
-  color: var(--gray-color);
+  color: var(--gray-600);
   transition: var(--transition);
   z-index: 1002;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-menu:hover {
-  color: var(--danger-color);
+  background: var(--gray-200);
+  color: var(--danger);
   transform: rotate(90deg);
 }
 
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-/* Tablet */
+/* Tablet Landscape */
 @media (max-width: 1024px) {
   .navbar {
     gap: 1rem;
@@ -224,32 +242,36 @@
   .site-name {
     font-size: 1.3rem;
   }
+  
+  .header-container {
+    padding: 0.875rem 1.5rem;
+  }
 }
 
-/* Mobile */
+/* Tablet Portrait & Mobile */
 @media (max-width: 768px) {
   .header-container {
     padding: 0.75rem 1rem;
   }
   
   .menu-icon {
-    display: block;
+    display: flex;
   }
   
   .navbar {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 80%;
+    width: 85%;
     max-width: 320px;
     height: 100vh;
     background: var(--white);
     flex-direction: column;
     justify-content: flex-start;
-    padding: 4rem 1.5rem 2rem;
+    padding: 5rem 1.5rem 2rem;
     gap: 0;
     box-shadow: var(--shadow-xl);
-    transition: right 0.3s ease-in-out;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
     overflow-y: auto;
   }
@@ -259,14 +281,14 @@
   }
   
   .close-menu {
-    display: block;
+    display: flex;
   }
   
   .navbar a {
     width: 100%;
     padding: 1rem;
     text-align: center;
-    border-bottom: 1px solid var(--light-gray);
+    border-bottom: 1px solid var(--gray-200);
     font-size: 1rem;
   }
   
@@ -275,9 +297,9 @@
   }
   
   .navbar a:hover {
-    background: var(--light-gray);
+    background: var(--gray-100);
     transform: translateX(5px);
-    padding-left: 1.5rem;
+    padding-left: 1.25rem;
   }
   
   /* Overlay when menu is open */
@@ -290,21 +312,12 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: -1;
-    animation: fadeInOverlay 0.3s ease;
-  }
-  
-  @keyframes fadeInOverlay {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    animation: fadeIn 0.3s ease;
   }
   
   .logo {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
   }
   
   .site-name {
@@ -329,8 +342,8 @@
   }
   
   .logo {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
   
   .site-name {
@@ -338,26 +351,54 @@
   }
   
   .menu-icon {
-    padding: 0.4rem;
+    width: 40px;
+    height: 40px;
   }
   
   .dot {
     width: 5px;
     height: 5px;
-    margin: 3px 0;
+    margin: 2px 0;
   }
 }
 
 /* ========================================
-   SCROLL ANIMATION
+   ANIMATIONS
    ======================================== */
-.header.scroll-down {
-  transform: translateY(-100%);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.header.scroll-up {
-  transform: translateY(0);
-  background: rgba(255, 255, 255, 0.98);
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Stagger animation for navbar items on mobile */
+@media (max-width: 768px) {
+  .navbar a {
+    animation: slideIn 0.3s ease backwards;
+  }
+  
+  .navbar a:nth-child(1) { animation-delay: 0.05s; }
+  .navbar a:nth-child(2) { animation-delay: 0.1s; }
+  .navbar a:nth-child(3) { animation-delay: 0.15s; }
+  .navbar a:nth-child(4) { animation-delay: 0.2s; }
+  .navbar a:nth-child(5) { animation-delay: 0.25s; }
+  .navbar a:nth-child(6) { animation-delay: 0.3s; }
+  .navbar a:nth-child(7) { animation-delay: 0.35s; }
+  .navbar a:nth-child(8) { animation-delay: 0.4s; }
 }
 
 /* ========================================
@@ -365,7 +406,7 @@
    ======================================== */
 @media (prefers-color-scheme: dark) {
   .header {
-    background: rgba(17, 24, 39, 0.95);
+    background: rgba(17, 24, 39, 0.98);
   }
   
   .header.scrolled {
@@ -373,7 +414,7 @@
   }
   
   .navbar a {
-    color: var(--light-gray);
+    color: var(--gray-300);
   }
   
   .navbar a:hover {
@@ -381,28 +422,33 @@
   }
   
   .menu-icon {
-    background: #374151;
+    background: var(--gray-800);
   }
   
   .dot {
-    background: var(--light-gray);
+    background: var(--gray-300);
   }
   
   @media (max-width: 768px) {
     .navbar {
-      background: var(--dark-bg);
+      background: var(--gray-900);
     }
     
     .navbar a {
-      border-bottom-color: #374151;
+      border-bottom-color: var(--gray-800);
     }
     
     .navbar a:hover {
-      background: #374151;
+      background: var(--gray-800);
     }
     
     .close-menu {
-      color: var(--light-gray);
+      background: var(--gray-800);
+      color: var(--gray-300);
+    }
+    
+    .close-menu:hover {
+      background: var(--gray-700);
     }
   }
 }
@@ -423,8 +469,9 @@
 /* Focus styles for keyboard navigation */
 .navbar a:focus-visible,
 .menu-icon:focus-visible,
-.close-menu:focus-visible {
-  outline: 2px solid var(--primary-color);
+.close-menu:focus-visible,
+.logo-section:focus-visible {
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -433,57 +480,47 @@
 @media (prefers-contrast: high) {
   .header {
     background: var(--white);
-    border-bottom: 2px solid var(--black);
+    border-bottom: 2px solid var(--gray-900);
   }
   
   .navbar a {
-    color: var(--black);
+    color: var(--gray-900);
   }
   
-  .navbar a:hover {
+  .navbar a:hover,
+  .navbar a.active {
     color: var(--primary-dark);
   }
-}
-
-/* ========================================
-   ANIMATIONS
-   ======================================== */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+  
+  @media (prefers-color-scheme: dark) {
+    .header {
+      background: var(--gray-900);
+      border-bottom-color: var(--white);
+    }
   }
 }
 
-.navbar a {
-  animation: slideIn 0.3s ease backwards;
+/* ========================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ======================================== */
+@media (hover: none) and (pointer: coarse) {
+  .navbar a:hover {
+    background: none;
+    transform: none;
+  }
+  
+  .logo-section:hover {
+    transform: none;
+  }
+  
+  .menu-icon:hover {
+    transform: none;
+  }
 }
-
-.navbar a:nth-child(1) { animation-delay: 0.05s; }
-.navbar a:nth-child(2) { animation-delay: 0.1s; }
-.navbar a:nth-child(3) { animation-delay: 0.15s; }
-.navbar a:nth-child(4) { animation-delay: 0.2s; }
-.navbar a:nth-child(5) { animation-delay: 0.25s; }
-.navbar a:nth-child(6) { animation-delay: 0.3s; }
-.navbar a:nth-child(7) { animation-delay: 0.35s; }
-.navbar a:nth-child(8) { animation-delay: 0.4s; }
 
 /* ========================================
-   UTILITY CLASSES
+   PRINT STYLES
    ======================================== */
-.header-blur {
-  backdrop-filter: blur(10px);
-}
-
-.no-scroll {
-  overflow: hidden;
-}
-
-/* Print styles */
 @media print {
   .header {
     position: static;
@@ -501,6 +538,7 @@
     position: static;
     flex-direction: row;
     box-shadow: none;
+    padding: 0;
   }
   
   .navbar a {
@@ -508,4 +546,24 @@
     padding: 0;
     margin: 0 1rem;
   }
+  
+  .navbar a::before {
+    display: none;
+  }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+.header,
+.navbar,
+.menu-icon {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Prevent body scroll when menu is open */
+body.menu-open {
+  overflow: hidden;
 }
