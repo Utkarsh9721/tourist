@@ -133,6 +133,8 @@ const TourismMap = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isAutoLoading, setIsAutoLoading] = useState(true);
+  const [isAutoPageLoading, setIsAutoPageLoading] = useState(true); // Auto page loading every 2 seconds
+  const [autoLoadTimer, setAutoLoadTimer] = useState(null);
   
   const mapRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -214,7 +216,7 @@ const TourismMap = () => {
       
       console.log('Fetching from hosted API:', url);
       const response = await axios.get(url, {
-        timeout: 10000, // 10 second timeout
+        timeout: 10000,
         headers: {
           'Content-Type': 'application/json',
         }
@@ -231,11 +233,9 @@ const TourismMap = () => {
           });
         } else {
           setTourismPlaces(newPlaces);
-          // Only extract filters on first load
           extractFiltersFromData(newPlaces);
         }
         
-        // Update pagination info
         if (response.data.pagination) {
           setCurrentPage(response.data.pagination.currentPage);
           setTotalPages(response.data.pagination.totalPages);
@@ -249,7 +249,6 @@ const TourismMap = () => {
           });
         }
         
-        // Update stats
         const allCurrentPlaces = append ? [...tourismPlaces, ...newPlaces] : newPlaces;
         const byType = {};
         allCurrentPlaces.forEach(place => {
@@ -266,9 +265,8 @@ const TourismMap = () => {
       }
     } catch (err) {
       console.error('Error loading data:', err);
-      setError(`Failed to load data: ${err.message}. Please check if the backend is running.`);
+      setError(`Failed to load data: ${err.message}`);
       
-      // Show user-friendly error message
       if (err.code === 'ECONNABORTED') {
         setError('Connection timeout. Please check your internet connection and try again.');
       } else if (err.response?.status === 404) {
@@ -280,6 +278,57 @@ const TourismMap = () => {
       setLoading(false);
       setLoadingMore(false);
       setInitialLoading(false);
+    }
+  };
+
+  // Auto load next page every 2 seconds
+  const startAutoPageLoading = useCallback(() => {
+    if (autoLoadTimer) {
+      clearInterval(autoLoadTimer);
+    }
+    
+    if (!isAutoPageLoading || !hasMore || loadingMore || loading) {
+      return;
+    }
+    
+    const timer = setInterval(() => {
+      if (hasMore && !loadingMore && !loading && isAutoPageLoading && currentPage < totalPages) {
+        console.log('Auto loading next page after 2 seconds...');
+        const nextPage = currentPage + 1;
+        if (nextPage <= totalPages) {
+          loadData(nextPage, true);
+          
+          // Auto scroll to bottom to see new content
+          setTimeout(() => {
+            if (sidebarRef.current) {
+              sidebarRef.current.scrollTo({
+                top: sidebarRef.current.scrollHeight,
+                behavior: 'smooth'
+              });
+            }
+          }, 500);
+        }
+      }
+    }, 2000); // 2 seconds interval
+    
+    setAutoLoadTimer(timer);
+  }, [isAutoPageLoading, hasMore, loadingMore, loading, currentPage, totalPages]);
+
+  // Stop auto page loading
+  const stopAutoPageLoading = () => {
+    if (autoLoadTimer) {
+      clearInterval(autoLoadTimer);
+      setAutoLoadTimer(null);
+    }
+  };
+
+  // Toggle auto page loading
+  const toggleAutoPageLoading = () => {
+    setIsAutoPageLoading(!isAutoPageLoading);
+    if (!isAutoPageLoading) {
+      startAutoPageLoading();
+    } else {
+      stopAutoPageLoading();
     }
   };
 
@@ -295,6 +344,7 @@ const TourismMap = () => {
 
   // Clear all filters and reset
   const clearAllFilters = () => {
+    stopAutoPageLoading();
     setSelectedType('all');
     setSelectedState('all');
     setSelectedCity('');
@@ -303,9 +353,12 @@ const TourismMap = () => {
     setCurrentPage(1);
     setHasMore(true);
     setTourismPlaces([]);
-    loadData(1, false);
+    loadData(1, false).then(() => {
+      if (isAutoPageLoading) {
+        setTimeout(() => startAutoPageLoading(), 1000);
+      }
+    });
     
-    // Show success message
     const message = document.createElement('div');
     message.className = 'toast-message';
     message.textContent = '✨ All filters cleared! Showing all places ✨';
@@ -350,24 +403,39 @@ const TourismMap = () => {
     }
   }, [setupObserver, initialLoading, tourismPlaces.length, hasMore, isAutoLoading]);
 
-  // Cleanup observer
+  // Cleanup observer and timer
   useEffect(() => {
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
+      if (autoLoadTimer) {
+        clearInterval(autoLoadTimer);
+      }
     };
-  }, []);
+  }, [autoLoadTimer]);
+
+  // Start auto page loading when data is loaded
+  useEffect(() => {
+    if (!initialLoading && hasMore && isAutoPageLoading && totalPages > currentPage) {
+      startAutoPageLoading();
+    }
+    return () => stopAutoPageLoading();
+  }, [initialLoading, hasMore, isAutoPageLoading, totalPages, currentPage]);
 
   // Reset and reload when filters change
   useEffect(() => {
     if (!initialLoading) {
+      stopAutoPageLoading();
       setCurrentPage(1);
       setHasMore(true);
       setTourismPlaces([]);
-      loadData(1, false);
+      loadData(1, false).then(() => {
+        if (isAutoPageLoading) {
+          setTimeout(() => startAutoPageLoading(), 1000);
+        }
+      });
       
-      // Scroll to top when filters change
       if (sidebarRef.current) {
         sidebarRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -424,6 +492,7 @@ const TourismMap = () => {
 
   // Handle location selection from search
   const handleLocationSelect = async (location) => {
+    stopAutoPageLoading();
     const coords = [parseFloat(location.lat), parseFloat(location.lon)];
     setSelectedLocation({
       name: location.display_name,
@@ -434,7 +503,6 @@ const TourismMap = () => {
     setSearchResults([]);
     setSearchQuery(location.display_name);
     
-    // Load nearby places with pagination
     try {
       const response = await axios.get(`${API_URL}/nearby`, {
         params: { 
@@ -460,6 +528,10 @@ const TourismMap = () => {
         setSelectedState('all');
         setSelectedCity('');
         setSelectedType('all');
+        
+        if (isAutoPageLoading) {
+          setTimeout(() => startAutoPageLoading(), 1000);
+        }
       }
     } catch (err) {
       console.error('Error finding nearby places:', err);
@@ -486,6 +558,7 @@ const TourismMap = () => {
     
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        stopAutoPageLoading();
         const coords = [position.coords.latitude, position.coords.longitude];
         setSelectedLocation({
           name: "Your Current Location",
@@ -519,6 +592,10 @@ const TourismMap = () => {
             setSelectedState('all');
             setSelectedCity('');
             setSelectedType('all');
+            
+            if (isAutoPageLoading) {
+              setTimeout(() => startAutoPageLoading(), 1000);
+            }
           } else {
             alert("No tourist places found near your location. Showing all places instead.");
             loadData(1, false);
@@ -627,6 +704,9 @@ const TourismMap = () => {
             <button onClick={() => setIsAutoLoading(!isAutoLoading)} className={`auto-load-button ${isAutoLoading ? 'active' : ''}`}>
               {isAutoLoading ? '🔁 Auto' : '⏸️ Manual'}
             </button>
+            <button onClick={toggleAutoPageLoading} className={`auto-page-button ${isAutoPageLoading ? 'active' : ''}`}>
+              {isAutoPageLoading ? '⏰ Auto Page (2s)' : '⏸️ Stop Auto'}
+            </button>
             {isMobile && (
               <button onClick={() => setShowSidebar(!showSidebar)} className="sidebar-toggle">
                 {showSidebar ? '📋 Hide' : '📋 Show'}
@@ -640,6 +720,9 @@ const TourismMap = () => {
               <span>📄 Page: <strong>{currentPage}</strong> of {totalPages}</span>
               <span>📋 Showing: <strong>{tourismPlaces.length}</strong> places</span>
               <span>📊 Loaded: <strong>{Math.round((tourismPlaces.length / totalItems) * 100)}%</strong></span>
+              {isAutoPageLoading && hasMore && (
+                <span className="auto-status">⏰ Auto loading every 2s</span>
+              )}
               {Object.entries(stats.byType).slice(0, 3).map(([type, count]) => (
                 <span key={type} className={`stat-type ${type}`}>
                   {type}: {count}
@@ -777,6 +860,11 @@ const TourismMap = () => {
                       <button onClick={loadNextPage} className="pagination-button load-more-btn">
                         📥 Load More ({currentPage}/{totalPages})
                       </button>
+                    )}
+                    {isAutoPageLoading && hasMore && (
+                      <div className="auto-loading-indicator">
+                        🤖 Auto loading next page in 2s...
+                      </div>
                     )}
                   </div>
                   
