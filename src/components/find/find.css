@@ -932,3 +932,92 @@
     height: 400px;
   }
 }
+/* ========================================
+   COMPLETE FIX - HIDE NAVBAR & STATS
+   ======================================== */
+
+/* Hide the main TransX title/navbar section */
+.tourism-map-container > div > div:first-child,
+.map-content > :first-child {
+  display: none !important;
+}
+
+/* Hide TransX heading */
+.tourism-map-container h1,
+.tourism-map-container h2,
+.map-content h1,
+.map-content h2,
+[class*="navbar"] h1,
+[class*="header"] h1 {
+  display: none !important;
+}
+
+/* Hide all stats bars at the top level */
+.stats-bar,
+[class*="stats-bar"],
+[class*="StatBar"],
+.stats-container,
+.stats-wrapper {
+  display: none !important;
+}
+
+/* Hide the specific stats showing Total, Page, Showing, Loaded */
+.map-content > div:has(strong),
+.map-content > div:has(> span > strong) {
+  display: none !important;
+}
+
+/* Hide the stats tags (other, restaurant, sight) */
+.stat-type,
+[class*="stat-type"] {
+  display: none !important;
+}
+
+/* Hide any element containing "Total:" text */
+div:has(> span > strong:contains("Total")),
+div:has(> strong:contains("Total")) {
+  display: none !important;
+}
+
+/* Force hide the first stats bar that appears */
+.tourism-map-container .stats-bar:first-of-type {
+  display: none !important;
+}
+
+/* Hide any content before the search section */
+.search-section:first-child {
+  margin-top: 0;
+}
+
+.tourism-map-container > .map-content > :not(.search-section) {
+  display: none !important;
+}
+
+/* Specifically target the navbar brand area */
+[class*="brand"],
+[class*="navbar-brand"],
+[class*="logo"],
+[class*="header-brand"] {
+  display: none !important;
+}
+
+/* Hide the stats line with numbers */
+[class*="stats"]:has(strong),
+[class*="Stats"]:has(strong) {
+  display: none !important;
+}
+
+/* Hide the "All States" and "All Types" filter if it's part of navbar */
+.filter-section:first-child {
+  margin-top: 0;
+}
+
+/* Ensure only the map and sidebar are visible */
+.map-layout {
+  margin-top: 0;
+}
+
+/* Remove any padding/margin that might be from hidden elements */
+.search-section {
+  margin-top: 0 !important;
+}
