@@ -1,30 +1,31 @@
-/* TourismMap.css - Professional Responsive Design with Improved Margins */
+/* TourismMap.css - Professional Light Theme with Navbar Hidden */
 
 /* ========================================
-   BASE STYLES & VARIABLES
+   BASE STYLES & VARIABLES - LIGHT THEME
    ======================================== */
 .tourism-map-container {
   --primary-color: #2c7da0;
   --primary-dark: #1f5e7e;
   --primary-light: #61a5c2;
   --secondary-color: #ff9f1c;
-  --success-color: #2dc653;
-  --warning-color: #e9c46a;
-  --danger-color: #e63946;
-  --text-dark: #2b2d42;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --text-dark: #212529;
   --text-gray: #6c757d;
-  --text-light: #8d99ae;
+  --text-light: #adb5bd;
   --bg-light: #f8f9fa;
   --bg-white: #ffffff;
-  --border-color: #e9ecef;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+  --bg-gray: #e9ecef;
+  --border-color: #dee2e6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.08);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
   --border-radius: 12px;
   --border-radius-md: 8px;
   --border-radius-sm: 6px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.3s ease;
 }
 
 /* ========================================
@@ -33,7 +34,7 @@
 .tourism-map-container {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%);
+  background: #f0f2f5;
 }
 
 .map-content {
@@ -48,6 +49,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  background: #f0f2f5;
 }
 
 .loading-spinner {
@@ -84,7 +86,7 @@
 }
 
 /* ========================================
-   SEARCH SECTION - IMPROVED MARGINS
+   SEARCH SECTION - LIGHT THEME
    ======================================== */
 .search-section {
   background: var(--bg-white);
@@ -92,6 +94,7 @@
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
 }
 
 .search-container {
@@ -116,12 +119,17 @@
   transition: var(--transition);
   background: var(--bg-white);
   margin: 0;
+  color: var(--text-dark);
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(44,125,160,0.1);
+}
+
+.search-input::placeholder {
+  color: var(--text-light);
 }
 
 .search-loader {
@@ -155,11 +163,13 @@
   background: var(--bg-light);
   color: var(--text-dark);
   margin: 0;
+  border: 1px solid var(--border-color);
 }
 
 .search-button {
   background: var(--primary-color);
   color: white;
+  border: none;
 }
 
 .search-button:hover {
@@ -173,7 +183,7 @@
 .satellite-button:hover,
 .auto-load-button:hover,
 .auto-page-button:hover {
-  background: var(--border-color);
+  background: var(--bg-gray);
   transform: translateY(-2px);
 }
 
@@ -181,43 +191,10 @@
 .auto-page-button.active {
   background: var(--success-color);
   color: white;
+  border-color: var(--success-color);
 }
 
-/* Stats Bar - Improved */
-.stats-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 16px 0;
-  border-top: 1px solid var(--border-color);
-  margin-top: 20px;
-  margin-bottom: 0;
-  font-size: 13px;
-  color: var(--text-gray);
-}
-
-.stats-bar span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.stat-type {
-  padding: 4px 12px;
-  background: var(--bg-light);
-  border-radius: 20px;
-  font-size: 12px;
-}
-
-.auto-status {
-  background: var(--warning-color);
-  padding: 4px 12px;
-  border-radius: 20px;
-  color: var(--text-dark);
-  font-weight: 500;
-}
-
-/* City Selector - Improved */
+/* City Selector */
 .city-selector-section {
   margin: 20px 0 16px 0;
 }
@@ -232,13 +209,14 @@
   background: var(--bg-white);
   cursor: pointer;
   margin: 0;
+  color: var(--text-dark);
 }
 
 .city-select:hover {
   border-color: var(--primary-light);
 }
 
-/* Filter Section - Improved */
+/* Filter Section */
 .filter-section {
   display: flex;
   flex-wrap: wrap;
@@ -257,6 +235,7 @@
   background: var(--bg-white);
   cursor: pointer;
   margin: 0;
+  color: var(--text-dark);
 }
 
 .filter-section select:hover {
@@ -265,7 +244,7 @@
 
 /* Error Message */
 .error-message {
-  background: #fff3f3;
+  background: #fff5f5;
   border-left: 4px solid var(--danger-color);
   padding: 16px 20px;
   margin-top: 20px;
@@ -299,6 +278,7 @@
   max-height: 300px;
   overflow-y: auto;
   margin: 0;
+  border: 1px solid var(--border-color);
 }
 
 .search-result-item {
@@ -324,7 +304,7 @@
 }
 
 /* ========================================
-   MAP LAYOUT - IMPROVED MARGINS
+   MAP LAYOUT
    ======================================== */
 .map-layout {
   display: flex;
@@ -341,6 +321,7 @@
   box-shadow: var(--shadow-md);
   overflow-y: auto;
   max-height: calc(100vh - 280px);
+  border: 1px solid var(--border-color);
 }
 
 .sidebar-header {
@@ -378,7 +359,7 @@
 .close-sidebar {
   padding: 6px 12px;
   background: var(--bg-light);
-  border: none;
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: var(--transition);
@@ -387,7 +368,7 @@
 
 .scroll-top-button:hover,
 .close-sidebar:hover {
-  background: var(--border-color);
+  background: var(--bg-gray);
 }
 
 /* Places List */
@@ -431,6 +412,7 @@
   display: flex;
   gap: 10px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .place-type {
@@ -442,14 +424,15 @@
   font-weight: 500;
   text-transform: uppercase;
   margin: 0;
+  color: var(--text-dark);
 }
 
-.place-type.hotel { background: #ffe5cc; color: #cc7a00; }
-.place-type.attraction { background: #d4f1f9; color: #2c7da0; }
-.place-type.museum { background: #e8d9ff; color: #6b3fa0; }
-.place-type.restaurant { background: #ffd9e6; color: #cc3366; }
-.place-type.temple { background: #fff3d4; color: #cc9900; }
-.place-type.park { background: #d9f0d9; color: #2d6a2d; }
+.place-type.hotel { background: #fff3e0; color: #cc7a00; }
+.place-type.attraction { background: #e8f4f8; color: #2c7da0; }
+.place-type.museum { background: #f0e8ff; color: #6b3fa0; }
+.place-type.restaurant { background: #ffe8f0; color: #cc3366; }
+.place-type.temple { background: #fff8e0; color: #cc9900; }
+.place-type.park { background: #e8f5e8; color: #2d6a2d; }
 
 .place-rating {
   font-size: 12px;
@@ -483,7 +466,7 @@
   margin: 0 auto 15px;
 }
 
-/* Pagination Controls - Improved */
+/* Pagination Controls */
 .pagination-controls {
   padding: 20px;
   text-align: center;
@@ -537,9 +520,10 @@
 .end-of-list {
   text-align: center;
   padding: 30px 20px;
-  background: linear-gradient(135deg, #f9f9f9, #fff);
+  background: linear-gradient(135deg, #f9f9f9, #ffffff);
   border-radius: var(--border-radius-md);
   margin: 15px 20px 20px 20px;
+  border: 1px solid var(--border-color);
 }
 
 .end-of-list p {
@@ -557,6 +541,7 @@
   border-radius: var(--border-radius-md);
   font-size: 13px;
   color: var(--text-gray);
+  border: 1px solid var(--border-color);
 }
 
 /* Map Container */
@@ -567,6 +552,7 @@
   box-shadow: var(--shadow-md);
   height: calc(100vh - 280px);
   min-height: 500px;
+  border: 1px solid var(--border-color);
 }
 
 .map-container.full-map {
@@ -630,7 +616,45 @@
 }
 
 /* ========================================
-   RESPONSIVE DESIGN - IMPROVED MARGINS
+   HIDE NAVBAR & STATS - COMPLETE FIX
+   ======================================== */
+
+/* Hide TransX title and navbar */
+.tourism-map-container h1,
+.tourism-map-container h2,
+.map-content h1,
+.map-content h2,
+[class*="navbar"] h1,
+[class*="header"] h1,
+[class*="brand"],
+[class*="navbar-brand"],
+[class*="logo"] {
+  display: none !important;
+}
+
+/* Hide all stats bars */
+.stats-bar,
+[class*="stats-bar"],
+[class*="StatBar"],
+.stats-container,
+.stats-wrapper,
+.stat-type,
+[class*="stat-type"] {
+  display: none !important;
+}
+
+/* Hide any content before search section */
+.map-content > :first-child:not(.search-section) {
+  display: none !important;
+}
+
+/* Ensure search section is first visible element */
+.search-section {
+  margin-top: 0 !important;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
    ======================================== */
 
 /* Tablet */
@@ -694,12 +718,6 @@
   .auto-page-button {
     width: 100%;
     justify-content: center;
-  }
-  
-  .stats-bar {
-    gap: 12px;
-    padding: 12px 0;
-    margin-top: 16px;
   }
   
   .map-layout {
@@ -778,17 +796,6 @@
     margin-bottom: 14px;
   }
   
-  .stats-bar {
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 0;
-    margin-top: 14px;
-  }
-  
-  .stats-bar span {
-    font-size: 12px;
-  }
-  
   .places-sidebar {
     max-height: 350px;
   }
@@ -834,38 +841,6 @@
   .manual-load-hint {
     margin: 15px 16px;
     padding: 12px;
-  }
-}
-
-/* Small Mobile */
-@media (max-width: 375px) {
-  .places-sidebar {
-    max-height: 300px;
-  }
-  
-  .map-container {
-    height: 300px;
-  }
-  
-  .place-card h4 {
-    font-size: 13px;
-  }
-  
-  .place-location {
-    font-size: 11px;
-  }
-  
-  .place-meta {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  
-  .sidebar-header h3 {
-    font-size: 14px;
-  }
-  
-  .places-count {
-    font-size: 12px;
   }
 }
 
@@ -931,93 +906,4 @@
     page-break-inside: avoid;
     height: 400px;
   }
-}
-/* ========================================
-   COMPLETE FIX - HIDE NAVBAR & STATS
-   ======================================== */
-
-/* Hide the main TransX title/navbar section */
-.tourism-map-container > div > div:first-child,
-.map-content > :first-child {
-  display: none !important;
-}
-
-/* Hide TransX heading */
-.tourism-map-container h1,
-.tourism-map-container h2,
-.map-content h1,
-.map-content h2,
-[class*="navbar"] h1,
-[class*="header"] h1 {
-  display: none !important;
-}
-
-/* Hide all stats bars at the top level */
-.stats-bar,
-[class*="stats-bar"],
-[class*="StatBar"],
-.stats-container,
-.stats-wrapper {
-  display: none !important;
-}
-
-/* Hide the specific stats showing Total, Page, Showing, Loaded */
-.map-content > div:has(strong),
-.map-content > div:has(> span > strong) {
-  display: none !important;
-}
-
-/* Hide the stats tags (other, restaurant, sight) */
-.stat-type,
-[class*="stat-type"] {
-  display: none !important;
-}
-
-/* Hide any element containing "Total:" text */
-div:has(> span > strong:contains("Total")),
-div:has(> strong:contains("Total")) {
-  display: none !important;
-}
-
-/* Force hide the first stats bar that appears */
-.tourism-map-container .stats-bar:first-of-type {
-  display: none !important;
-}
-
-/* Hide any content before the search section */
-.search-section:first-child {
-  margin-top: 0;
-}
-
-.tourism-map-container > .map-content > :not(.search-section) {
-  display: none !important;
-}
-
-/* Specifically target the navbar brand area */
-[class*="brand"],
-[class*="navbar-brand"],
-[class*="logo"],
-[class*="header-brand"] {
-  display: none !important;
-}
-
-/* Hide the stats line with numbers */
-[class*="stats"]:has(strong),
-[class*="Stats"]:has(strong) {
-  display: none !important;
-}
-
-/* Hide the "All States" and "All Types" filter if it's part of navbar */
-.filter-section:first-child {
-  margin-top: 0;
-}
-
-/* Ensure only the map and sidebar are visible */
-.map-layout {
-  margin-top: 0;
-}
-
-/* Remove any padding/margin that might be from hidden elements */
-.search-section {
-  margin-top: 0 !important;
 }
